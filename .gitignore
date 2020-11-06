@@ -1,0 +1,17 @@
+# Ignore python compiled code
+__pycache__/
+*.pyc
+
+# Ignore common output files
+*.exe
+*.o
+*.so
+*.dll
+*.jar
+
+# Ignore common output directories
+build/
+bin/
+reports/
+
+
