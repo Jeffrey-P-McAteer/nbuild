@@ -13,4 +13,47 @@
 This directory holds the `nbuild/` source directory as well as an `examples/` directory showing
 how one might use `nbuild` to generate reports about projects.
 
+# Example Processes
+
+## Process 01
+
+1. A tester uses the `nbuild` library to write `review_proj01.py`,
+   which is a formal description of the project deliverables and what the deliverables must do.
+
+2. A contractor submits a project as source code on a USB drive. The code resides in a folder "proj01".
+
+3. The tester runs `python review_proj01.py` and their browser opens to the following report:
+
+![screenshots/proj01-report01.jpg](screenshots/proj01-report01.jpg)
+
+## Process 02
+
+1. A tester uses the `nbuild` library to write `review_nasa_worldwind.py`,
+   which is a formal description of a public library written by NASA.
+
+2. The tester runs `python review_nasa_worldwind.py` and their browser opens to the following report:
+  
+![screenshots/nasa_worldwind-report01.jpg](screenshots/nasa_worldwind-report01.jpg)
+
+## Process 02
+
+1. A tester uses the `nbuild` library to describe a physical process for testing
+   a new artillery loading mechanism in `review_artillery_loading.py`. This requires a person to perform the tests
+   and `nbuild` will issue instructions textually. The person doing
+   the test will respond to simple "yes or no" questions.
+
+2. The tester runs `python review_artillery_loading.py` and follows the instructions given.
+   When completed a report like the following will be generated:
+  
+![screenshots/artillery_loading-report01.jpg](screenshots/artillery_loading-report01.jpg)
+
+
+# Plans
+
+ - [ ] Self-service HTTP server (upload `.exe` files, get reports back)
+ - [ ] Record runtime
+ - [ ] Predict runtime 
+ - [ ] Support Maven builds (java)
+ - [ ] Support Gradle builds (java)
+ - [ ] Support DotNet builds (C\#)
 

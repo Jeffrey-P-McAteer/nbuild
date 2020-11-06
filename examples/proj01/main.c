@@ -6,10 +6,10 @@ int main(int argc, char** argv) {
   if (argc > 1) {
     name = argv[1];
   }
-  printf("I got %d arguments!\n", argc);
+  //printf("I got %d arguments!\n", argc);
   //printf("Hello %s!\n", name);
-  //printf("Hello World!\n", name);
-  //return 0;
-  return 1;
+  printf("Hello World!\n", name);
+  return 0;
+  //return 1;
 }
 
