@@ -61,4 +61,11 @@ how one might use `nbuild` to generate reports about projects.
 
 Run `python do_quality_checks.py` to check the `nbuild` library code quality.
 
+Pass your favorite editor (`subl3` for Sublime 3, `idea` for the IntelliJ IDE)
+to the command to have it open at the first line that failed the linter:
+
+```bash
+python do_quality_checks.py edit-with subl3
+```
+
 
