@@ -57,3 +57,8 @@ how one might use `nbuild` to generate reports about projects.
  - [ ] Support Gradle builds (java)
  - [ ] Support DotNet builds (C\#)
 
+# Project Hygiene
+
+Run `python do_quality_checks.py` to check the `nbuild` library code quality.
+
+

@@ -1,0 +1,26 @@
+
+# See https://github.com/kubeflow/examples/blob/master/.pylintrc
+
+
+[MESSAGES CONTROL]
+
+disable=trailing-newlines,
+    trailing-whitespace,
+    duplicate-code,
+    too-many-arguments,
+    line-too-long,
+    too-few-public-methods,
+
+
+[BASIC]
+# We use single-letter variables in readable places
+good-names=t,e,p,
+
+[REPORTS]
+
+# HTML support was dropped as of 1.6
+# output-format=html
+output-format=text
+
+reports=yes
+
