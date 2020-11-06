@@ -10,6 +10,7 @@ disable=trailing-newlines,
     too-many-arguments,
     line-too-long,
     too-few-public-methods,
+    too-many-instance-attributes,
 
 
 [BASIC]

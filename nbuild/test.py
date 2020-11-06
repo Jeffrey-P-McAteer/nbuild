@@ -1,4 +1,10 @@
 
+"""
+The test module contains the TestSystem class.
+The Test class is not used externally.
+"""
+
+
 import os
 import subprocess
 import platform
@@ -7,7 +13,17 @@ import shutil
 from nbuild.util import ask_yn_q
 
 class Test:
+    """
+    An internal class to track some test task,
+    a description of the task, and the task success state.
+    """
+
+    @staticmethod
     def no_task_task():
+        """
+        Default task which crashes the program because someone
+        forgot to specify work to be done/tested
+        """
         raise Exception("No task specified!")
 
     def __init__(self, description="No Description", task=no_task_task):
@@ -16,6 +32,7 @@ class Test:
         self.passed = False
 
     def test(self, *args):
+        """Runs this test and records if it passed"""
         p = self.task(*args)
         if not isinstance(p, (bool)):
             raise Exception("test tasks MUST return a boolean (True or False). Good examples may be a lambda that returns 'x == 5' or 'output.startswith(\"completed\")'")
@@ -23,6 +40,13 @@ class Test:
 
 
 class TestSystem:
+    """
+    The TestSystem class represents an entire test routine.
+    After using a method in `nbuild` to create a test system,
+    chained methods may be used to specify any number of
+    individual test cases for the project.
+    """
+
     def __init__(self, *args, _type="execute", **kwargs):
         self._type = _type
         self.args = args
@@ -40,6 +64,11 @@ class TestSystem:
       
 
     def with_stdout(self, description, task):
+        """
+        Only valid for executable files.
+        `task` receives the program's standard output as a string
+        and must return True if the test passed, otherwise False.
+        """
         if self._type != "execute":
             raise Exception("Cannot call with_stdout unless task type is 'execute'")
         self.tests.append(Test(
@@ -49,6 +78,9 @@ class TestSystem:
         return self
 
     def default_npm(self):
+        """
+        Only valid for NPM tests, used internally.
+        """
         if self._type != "npm":
             raise Exception("Cannot call default_npm unless task type is 'npm'")
         
@@ -68,22 +100,22 @@ class TestSystem:
         return self
 
     def default_physical(self):
+        """
+        Only valid for physical tests, used internally.
+        """
         if self._type != "physical":
             raise Exception("Cannot call default_physical unless task type is 'physical'")
       
         def inner_physical(step):
-          
+            
             print('')
             if step.lower().startswith('q:'):
                 return ask_yn_q(step[2:].strip())
               
-            else:
-                print('> {}'.format(step))
-                return ask_yn_q('Type "yes" when step completed, or "no" if step cannot be completed.')
-
-            return False
+            print('> {}'.format(step))
+            return ask_yn_q('Type "yes" when step completed, or "no" if step cannot be completed.')
             
-        for step in [x for x in self.kwargs['steps']]:
+        for step in list(self.kwargs['steps']):
             self.tests.append(Test(
                 description=step,
                 task=(lambda istep: lambda: inner_physical(istep))(step) # 1 level of indirection so we save THIS iteration's step value
@@ -93,6 +125,11 @@ class TestSystem:
       
 
     def run_pretest_tasks(self, project):
+        """
+        Internal method which sets up for tests; at the moment
+        only the "execute" type uses this to collect program
+        output before running tests on the output.
+        """
         if self._type == "execute":
             try:
                 self.execute_stdout = subprocess.run(
@@ -108,26 +145,32 @@ class TestSystem:
 
 
     def test(self, project):
+        """Runs all tests"""
         self.run_pretest_tasks(project)
         if len(self.tests) < 1:
             raise Exception("No tests specified!")
         if self._type == "execute":
             for t in self.tests:
-                passed = t.test(self.execute_stdout)
+                t.test(self.execute_stdout)
 
         elif self._type == "npm":
             for t in self.tests:
-                passed = t.test()
+                t.test()
 
         elif self._type == "physical":
             for t in self.tests:
-                passed = t.test()
+                t.test()
             self.physical_test_notes = input('Write any additional notes here, typing enter when complete: ')
 
         else:
             raise Exception("Unknown testing procedure for TestSystem._type = {}".format(self._type))
 
     def write_reports_to(self, project, directory):
+        """
+        Generates a file "nbuild_test_report.html" in the specified directory.
+        May also copy in results of 3rd-party test reports from Unit testing frameworks
+        and other automated test suites.
+        """
         test_rep_path = os.path.join(directory, 'nbuild_test_report.html')
         with open(test_rep_path, 'w') as test_rep:
             # test_table is a bunch of <tr> rows with <td> columns
@@ -215,6 +258,11 @@ pre {{
         self.reports.append(test_rep_path)
 
     def open_reports(self):
+        """
+        Must be called after write_reports_to has been called.
+        Opens all report files in their default programs, for example
+        Chrome will usually open .html files and Adobe products will usually open .pdf files.
+        """
         for filepath in self.reports:
             if platform.system() == 'Darwin':
                 subprocess.call(('open', filepath))

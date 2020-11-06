@@ -1,4 +1,9 @@
 
+"""
+The project module holds the Project class.
+"""
+
+
 import os
 
 from nbuild.deliverable import Deliverable
@@ -6,11 +11,25 @@ from nbuild.build import BuildSystem
 from nbuild.test import TestSystem
 
 class Project:
+    """
+    The Project class represents one project,
+    and is constructed with the project's:
+
+     - Name
+     - Input Deliverables
+     - Build System (optional)
+     - Output Deliverables (optional)
+     - Test System
+
+    once constructed the project
+    may be built, tested, and reports generated
+    in any given directory.
+    """
     def __init__(
         self,
         name="Unnamed Project",
         deliverables_in=None,
-        build_system=None,
+        build_system=BuildSystem(_type="none"),
         deliverables_out=None,
         test_system=None,
     ):
@@ -38,23 +57,28 @@ class Project:
       
 
     def build(self):
+        """Instructs the build system to perform a build (defaults to nothing)"""
         self.build_system.build(self)
 
     def test(self):
+        """Instructs the test system to test the project"""
         self.test_system.test(self)
     
     def write_reports_to(self, directory):
+        """Creates and fills a directory with report files (usually .html)"""
         if not os.path.exists(directory):
             os.makedirs(directory)
 
         self.test_system.write_reports_to(self, directory)
 
     def open_reports(self):
+        """Opens any generated reports in their default applications (browser for .html, adobe for .pdf, etc.)"""
         self.test_system.open_reports()
 
     # Utilities for build + test systems to use,
     # answers common questions about projects.
 
     def get_cwd(self):
+        """Asks the input deliverables for their CWD. Mostly used internally."""
         return self.deliverables_in.get_cwd()
 
