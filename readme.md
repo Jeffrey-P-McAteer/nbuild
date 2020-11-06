@@ -29,7 +29,7 @@ how one might use `nbuild` to generate reports about projects.
 ## Process 02
 
 1. A tester uses the `nbuild` library to write `review_nasa_worldwind.py`,
-   which is a formal description of a public library written by NASA.
+   which is a formal description of a [public mapping library written by NASA](https://worldwind.arc.nasa.gov/).
 
 2. The tester runs `python review_nasa_worldwind.py` and their browser opens to the following report:
   
