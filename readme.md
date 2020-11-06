@@ -35,7 +35,7 @@ how one might use `nbuild` to generate reports about projects.
   
 ![screenshots/nasa_worldwind-report01.jpg](screenshots/nasa_worldwind-report01.jpg)
 
-## Process 02
+## Process 03
 
 1. A tester uses the `nbuild` library to describe a physical process for testing
    a new artillery loading mechanism in `review_artillery_loading.py`. This requires a person to perform the tests
