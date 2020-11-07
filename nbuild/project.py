@@ -9,6 +9,7 @@ import os
 from nbuild.deliverable import Deliverable
 from nbuild.build import BuildSystem
 from nbuild.test import TestSystem
+from nbuild.http_test_server import run_http_server
 
 class Project:
     """
@@ -54,7 +55,13 @@ class Project:
             raise Exception("test_system must be a TestSystem")
         self.test_system = test_system
         self.test_system.project = self
-      
+    
+    def run_test_server(self, port=8080):
+        """
+        Runs a self-serve webpage where deliverables
+        may be uploaded and reports downloaded.
+        """
+        run_http_server(self, port=port)
 
     def build(self):
         """Instructs the build system to perform a build (defaults to nothing)"""
