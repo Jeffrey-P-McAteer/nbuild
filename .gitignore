@@ -8,11 +8,19 @@ __pycache__/
 *.so
 *.dll
 *.jar
+*.egg-info
 
 # Ignore common output directories
 build/
 bin/
 reports/
 html/
+dist/
+
+# Ignore any common secrets (just being overly cautious)
+.pypirc
+*.pypirc
+.env
+.env/
 
 

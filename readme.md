@@ -1,6 +1,8 @@
 
 # Navy Build
 
+_A modern project-as-code specification, build, testing, and report generation library._
+
 `nbuild` is a library providing the following capabilities:
 
  - Describe a software project from artifacts (source or binary redistributables) to artifacts (usually programs as `.exe` files)
@@ -12,6 +14,8 @@
 
 This directory holds the `nbuild/` source directory as well as an `examples/` directory showing
 how one might use `nbuild` to generate reports about projects.
+
+This library is also available from pypi/`pip`: https://pypi.org/project/nbuild/
 
 # Example Processes
 
@@ -51,11 +55,13 @@ how one might use `nbuild` to generate reports about projects.
 # Plans
 
  - [ ] Self-service HTTP server (upload `.exe` files, get reports back)
+ - [ ] Workflow flowchart generation from project definition
  - [ ] Record runtime
  - [ ] Predict runtime 
  - [ ] Support Maven builds (java)
  - [ ] Support Gradle builds (java)
  - [ ] Support DotNet builds (C\#)
+ - [ ] Support partial automation (eg move seamlessly from an automated step to a manual step + vice versa)
 
 # Project Hygiene
 
@@ -96,6 +102,10 @@ python -m pdoc --html nbuild
 # one-liner to open ./html/nbuild/index.html for documentation
 python -m pdoc --html --force nbuild && xdg-open ./html/nbuild/index.html
 ```
+
+# Code license
+
+See [license.txt](license.txt) for details, it contains a copy of the [MIT license](https://en.wikipedia.org/wiki/MIT_License).
 
 
 
