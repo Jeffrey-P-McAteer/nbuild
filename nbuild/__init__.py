@@ -114,6 +114,7 @@ __pdoc__ = {
     'test': False,
     'http_test_server': False,
     'util': False,
+    'flowchart_gen': False,
 }
 
 
