@@ -59,6 +59,19 @@ how one might use `nbuild` to generate reports about projects.
 
 # Project Hygiene
 
+You will need [pylint](https://www.pylint.org/) installed to run code analysis below.
+
+You will need [pylint](https://www.pylint.org/) installed to run code analysis below.
+
+One-liners for dependencies:
+
+```bash
+python -m pip install --user pylint
+python -m pip install --user pdoc3
+```
+
+## Code Quality
+
 Run `python do_quality_checks.py` to check the `nbuild` library code quality.
 
 Pass your favorite editor (`subl3` for Sublime 3, `idea` for the IntelliJ IDE)
@@ -67,5 +80,17 @@ to the command to have it open at the first line that failed the linter:
 ```bash
 python do_quality_checks.py edit-with subl3
 ```
+
+# Code Documentation
+
+The code is annotated with docstrings, so most python documentation generators
+will produce something useful. We use [pdoc](https://pdoc3.github.io/pdoc/) for our
+own copies of documentation, which places `.html` files under a `./html/` directory.
+
+```bash
+python -m pdoc --html nbuild
+# Open ./html/nbuild/index.html for documentation
+```
+
 
 

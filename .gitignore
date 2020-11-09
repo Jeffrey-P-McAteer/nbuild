@@ -13,5 +13,6 @@ __pycache__/
 build/
 bin/
 reports/
+html/
 
 
