@@ -73,4 +73,48 @@ def physical_test(*steps):
     return TestSystem(_type="physical", steps=list(steps)).default_physical()
 
 
+# nbuild cares a great deal about it's public API;
+# to prevent people from using/reading about internals they
+# have no business using we explicitly define __all__,
+# the behaviour of which is documented here: https://docs.python.org/3/tutorial/modules.html#importing-from-a-package
+__all__ = [
+    # Classes
+    'Project',
+    'Deliverable',
+    'BuildSystem',
+    'TestSystem',
+
+    # fns to create deliverables
+    'src_directory',
+    'src_file',
+    'executable',
+    'git_repository',
+    'physical_items',
+    
+    # fns to create build/assembly instructions
+    'make',
+    'npm_build',
+    'physical_prep',
+    
+    # fns to perform tests
+    'execute',
+    'npm_test',
+    'physical_test',
+
+]
+
+# The __pdoc__ dictionary contains
+# details for pdoc to respect when
+# generating documentation.
+# See https://pdoc3.github.io/pdoc/doc/pdoc/#overriding-docstrings-with-__pdoc__&gsc.tab=0
+__pdoc__ = {
+    'project': False,
+    'deliverable': False,
+    'build': False,
+    'test': False,
+    'http_test_server': False,
+    'util': False,
+}
+
+
 

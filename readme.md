@@ -78,7 +78,11 @@ Pass your favorite editor (`subl3` for Sublime 3, `idea` for the IntelliJ IDE)
 to the command to have it open at the first line that failed the linter:
 
 ```bash
+python do_quality_checks.py
+# or if you have subl3 installed:
 python do_quality_checks.py edit-with subl3
+# for IntelliJ customers:
+python do_quality_checks.py edit-with idea.exe
 ```
 
 # Code Documentation
@@ -89,7 +93,8 @@ own copies of documentation, which places `.html` files under a `./html/` direct
 
 ```bash
 python -m pdoc --html nbuild
-# Open ./html/nbuild/index.html for documentation
+# one-liner to open ./html/nbuild/index.html for documentation
+python -m pdoc --html --force nbuild && xdg-open ./html/nbuild/index.html
 ```
 
 

@@ -8,6 +8,8 @@ This directory holds the `nbuild` python library implementation.
 Linux/MacOS:
 ```bash
 cp -r . $HOME/.local/lib/python3.8/site-packages/nbuild/ && ( cd ../examples && python review_proj01.py)
+# or from repo root
+cp -r nbuild $HOME/.local/lib/python3.8/site-packages/ && ( cd examples && python review_proj01.py )
 ```
 
 Windows:
