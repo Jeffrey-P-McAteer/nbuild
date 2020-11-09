@@ -35,7 +35,11 @@ legend {
 """
 
 class Server(BaseHTTPRequestHandler):
-
+    """
+    This is not _technically_ the server, it is an HTTP request handler which
+    performs tasks on POST/GET requests. This means self.* data will
+    not persist from one GET to the next GET request.
+    """
     def __init__(self, project, *args, **kwargs):
         print("Server __init__")
         self.project = project
@@ -51,10 +55,11 @@ class Server(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(html.encode('utf-8'))
 
-    def do_GET(self):
+    def do_GET(self): # pylint: disable=invalid-name
+        """Handles HTTP get requests and serves .html/.js/.css data"""
         path = self.path.lower()
         if path == "/" or path == "/index.html" or "index.html" in path:
-          self._reply_with_html("""<DOCTYPE html>
+            self._reply_with_html("""<DOCTYPE html>
 <html>
   <head>
     <title>{name} Test Portal</title>
@@ -91,12 +96,13 @@ class Server(BaseHTTPRequestHandler):
             self._reply_with_html("""<h1>404 Not Found</h1>
             """, code=404)
 
-    def do_POST(self):
+    def do_POST(self): # pylint: disable=invalid-name
+        """Handles HTTP post requests and records form submissions"""
         content_length = abs( int(self.headers['Content-Length']) )
         # Do not accept files > 1gb large (small security check we can bump later)
         if content_length > 1_200_000_000:
-          self._reply_with_html("Error, current upload limit is 1,200,000,000 bytes (approx. 1gb), you sent {} bytes.".format(content_length), code=413)
-          return
+            self._reply_with_html("Error, current upload limit is 1,200,000,000 bytes (approx. 1gb), you sent {} bytes.".format(content_length), code=413)
+            return
         
         post_data = self.rfile.read(content_length)
         
@@ -106,16 +112,21 @@ class Server(BaseHTTPRequestHandler):
             self._reply_with_html("""<h2>Deliverable received</h2>
               <p>Return to the previous page to read report. Note that for large projects reports may take 3-4 minutes to generate.</p>
               <p>You may also <a href="last-report.html">open the report directly using this link</a>.</p>
-            """) # TODO can we predict time?
+            """) # TO DO can we predict time?
 
 
 
     def process_deliverables(self, post_data):
-        self.last_report_html = "TODO report generated at {}".format( datetime.now() )
+        """Given some uploaded deliverables, start a test and save report data"""
+        self.last_report_html = "TODO report generated at {} ({})".format( datetime.now(), post_data )
 
     def get_deliverables_form(self):
+        """
+        Given self.project, create a suitable form to receive deliverables with
+        (eg .zip upload, .exe upload, checkbox that physical goods were dropped off)
+        """
         if self.deliverables_form:
-          return self.deliverables_form
+            return self.deliverables_form
 
         if self.project.deliverables_in._type == "directory":
             # Build form to upload .zip / .tar file
@@ -130,12 +141,18 @@ class Server(BaseHTTPRequestHandler):
             """
 
         else:
-          raise Exception("Unknown delivery form for type {}".format(self.project.deliverables_in._type))
+            raise Exception("Unknown delivery form for type {}".format(self.project.deliverables_in._type))
 
-        return self.deliverables_form;
+        return self.deliverables_form
 
 
 def run_http_server(project, port=8080):
+    """
+    Runs an HTTP server and blocks until process exits.
+    The server will have a form for project deliverables
+    and upon deliverables being uploaded the server will
+    run builds and tests, returning a report of the project.
+    """
     server_address = ('', port)
     handler = partial(Server, project) # partial() is respnsible for passing project to Server.__init__
     httpd = HTTPServer(server_address, handler)

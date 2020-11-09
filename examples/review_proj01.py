@@ -46,6 +46,10 @@ p = nbuild.Project(
 
 )
 
+# Now that the project is described we can
+# generate flowcharts using graphviz
+p.write_flowcharts_to(os.path.join(this_dir, 'reports'))
+
 p.build()
 
 p.test()

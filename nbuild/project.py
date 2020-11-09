@@ -11,6 +11,8 @@ from nbuild.build import BuildSystem
 from nbuild.test import TestSystem
 from nbuild.http_test_server import run_http_server
 
+from nbuild import util
+
 class Project:
     """
     The Project class represents one project,
@@ -71,6 +73,20 @@ class Project:
         """Instructs the test system to test the project"""
         self.test_system.test(self)
     
+    def write_flowcharts_to(self, directory):
+        """Instructs the build and test system to use graphviz to generate a flowchart for the entire project"""
+        try:
+            import graphviz # pylint: disable=import-outside-toplevel,import-error,unused-import
+        except Exception as e:
+            util.print_banner(
+                "You need 'graphviz' installed to run Project.write_flowcharts_to",
+                "Install using pip: python -m pip install --user graphviz"
+            )
+            raise e
+
+        print("TODO use graphviz to gen build and test flowcharts", self.build_system, directory)
+
+
     def write_reports_to(self, directory):
         """Creates and fills a directory with report files (usually .html)"""
         if not os.path.exists(directory):

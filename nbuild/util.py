@@ -4,6 +4,19 @@ The util module contains miscellaneous
 tools used internally.
 """
 
+def print_banner(*msg_lines, character='=', indent='   '):
+    """
+    Prints a large banner with each of the strings in msg_lines indented.
+    Designed for errors which users should correct, such as installing graphviz.
+    """
+    print()
+    print(character * 20)
+    print()
+    for line in list(msg_lines):
+        print(indent, line)
+    print()
+    print(character * 20)
+    print()
 
 def ask_yn_q(question):
     """
