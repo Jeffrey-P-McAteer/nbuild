@@ -2,6 +2,7 @@
 import subprocess
 import threading
 import os
+import time
 
 class Task:
     def __init__(self, task_name, **kwargs):
@@ -35,15 +36,33 @@ class Task:
         if not os.path.exists(f):
             f = os.path.join(self.project.get_cwd(), f)
 
-        self.project.task_data['proc'] = subprocess.Popen([f] + self.kwargs['args'], cwd=self.project.get_cwd())
+        self.project.task_data['proc'] = subprocess.Popen(
+            [f] + self.kwargs['args'],
+            cwd=self.project.get_cwd(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=0, # unbuffered
+        )
         self.project.task_data['proc_stdout'] = ""
-        
+
         # Run thread to copy stdout into self.project.task_data['proc_stdout']
         def poll_proc():
-            for stdout_line in iter(self.project.task_data['proc'].stdout.readline, ""):
-                self.project.task_data['proc_stdout'] += stdout_line
+            p = self.project.task_data['proc']
+            while True:
+                out = p.stdout.read(1)
+                is_empty = (out == '' or out == b'' or len(out) < 1)
+                if is_empty and p.poll() != None:
+                    break
+                if not is_empty:
+                    # To/Do this will break pretty badly if we have multibyte utf-8 characters
+                    self.project.task_data['proc_stdout'] += out.decode('utf-8')
 
-        threading.Thread(target=poll_proc, args=())
+        t = threading.Thread(target=poll_proc, args=())
+        t.start()
+        
+        # Pause for 1/4 second to let process begin (lots of tests will expect some stdout)
+        time.sleep(0.25)
+
         if self.project.task_data['proc']:
           return True
         else:
@@ -52,6 +71,7 @@ class Task:
     def stdout_check(self):
         if self.kwargs['must_contain']:
           # Check if proc_stdout has must_contain in it
+          print('proc_stdout={}'.format(self.project.task_data['proc_stdout']))
           if self.kwargs['case_insensitive']:
             return self.kwargs['must_contain'].lower() in self.project.task_data['proc_stdout'].lower()
           else:
