@@ -22,6 +22,7 @@ p = nb.Project(
       name='non-interactive test',
       tests=[
         nb.Test(name='Executable launches', task=nb.Task_LaunchProgram(file='main.exe', args=['John Smith'])),
+        nb.Test(name='App Greets User (non-interactive)', task=nb.Task_StdoutCheck(must_contain='hello john smith', case_insensitive=True)),
 
       ]
     ),

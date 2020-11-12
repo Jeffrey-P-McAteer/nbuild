@@ -25,8 +25,8 @@ from nbuild.task import *
 __all__ = [
     # Classes
     'Project',
-    #'Deliverable',
-
+    'Test',
+    
 ]
 
 # The __pdoc__ dictionary contains

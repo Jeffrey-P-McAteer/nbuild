@@ -37,13 +37,17 @@ class Project:
 
       # and initialize state used during eval/reporting stages
       self.reports = []
+      self.task_data = {} # tasks may assign whatever key/value data they want here
 
       for t in self.tests:
           t.set_project(self)
 
   def evaluate(self):
       for t in self.tests:
-          pass
+          t.evaluate()
+
+  def get_cwd(self):
+      return self.deliverable.get_cwd()
 
   def write_reports_to(self, directory='.'):
       if not os.path.exists(directory):
