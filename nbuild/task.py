@@ -52,18 +52,19 @@ class Task:
         return task_method_to_call()
 
     # Now define all the various compile/launch/whatever methods
-    def compile(self):
+    def compile(self): # pylint: disable=missing-function-docstring
+        success = False
         if self.kwargs['build_system'] == 'make':
-            p = subprocess.run(['make'], cwd=self.project.get_cwd())
+            p = subprocess.run(['make'], cwd=self.project.get_cwd()) # pylint: disable=subprocess-run-check
             if p.returncode:
-                return False # Something broke
+                success = False # Something broke
             else:
-                return True
-
+                success = True
         else:
             raise Exception('Unknown build_system for task "compile": {}'.format(self.kwargs['build_system']))
+        return success
 
-    def launch(self):
+    def launch(self): # pylint: disable=missing-function-docstring
         f = self.kwargs['file']
         if not os.path.exists(f):
             f = os.path.join(self.project.get_cwd(), f)
@@ -107,7 +108,7 @@ class Task:
                             sm.buf[i] = 0
 
                     # Check if process exited; if so we also exit
-                    if self.project.task_data['proc'].poll() != None:
+                    if self.project.task_data['proc'].poll() is not None:
                         break
 
                 sm.close()
@@ -123,7 +124,7 @@ class Task:
                 while True:
                     out = p.stdout.read(1)
                     is_empty = (out == '' or out == b'' or len(out) < 1)
-                    if is_empty and p.poll() != None:
+                    if is_empty and p.poll() is not None:
                         break
                     if not is_empty:
                         # To/Do this will break pretty badly if we have multibyte utf-8 characters
@@ -135,12 +136,9 @@ class Task:
         # Pause for 1/4 second to let process begin (lots of tests will expect some stdout)
         time.sleep(0.25)
 
-        if self.project.task_data['proc']:
-            return True
-        else:
-            return False
+        return bool(self.project.task_data['proc']) # true if process launched, otherwise maybe false
 
-    def stdout_check(self):
+    def stdout_check(self): # pylint: disable=missing-function-docstring
         if self.kwargs['must_contain']:
             # Check if proc_stdout has must_contain in it
             # print('proc_stdout={}'.format(self.project.task_data['proc_stdout']))
@@ -161,30 +159,37 @@ class Task:
 
         return False
 
-    def tester_question(self):
+    def tester_question(self): # pylint: disable=missing-function-docstring
         self.project.task_data[ self.kwargs['save_as'] ] = input(self.kwargs['question']+' ')
         return True
 
 
 def Task_Compile(build_system=None):
+    """Creates a Task which can compile code"""
     return Task('compile', build_system=build_system)
 
-def Task_LaunchProgram(file=None, args=[], interactive=False):
+def Task_LaunchProgram(file=None, args=None, interactive=False):
+    """Creates a Task which executes deliverables"""
+    if args is None:
+        args = []
     return Task('launch', file=file, args=args, interactive=interactive)
 
 def Task_StdoutCheck(must_contain=None, case_insensitive=False):
+    """Creates a Task which polls a previously launched program's output and checks it for given values"""
     return Task('stdout_check', must_contain=must_contain, case_insensitive=case_insensitive)
 
 def Task_TesterQuestion(question=None, save_as='last_resp'):
+    """Creates a Task which prompts the tester to enter some information which is saved in project.task_data"""
     return Task('tester_question', question=question, save_as=save_as)
 
 
-# task.py also has this small program which wraps a given command and
-# executes it, forwarding stdout to the parent process using shared memory.
-# This is used to record program output when opening in a new GUI window for
-# test operators to manipulate.
-
-if __name__ == '__main__':
+def main():
+    """
+    task.py also has this small program which wraps a given command and
+    executes it, forwarding stdout to the parent process using shared memory.
+    This is used to record program output when opening in a new GUI window for
+    test operators to manipulate.
+    """
     cmd = sys.argv[1:]
     
     sm = None
@@ -207,7 +212,7 @@ if __name__ == '__main__':
         while True:
             out = p.stdout.read(1)
             is_empty = (out == '' or out == b'' or len(out) < 1)
-            if is_empty and p.poll() != None:
+            if is_empty and p.poll() is not None:
                 break
             if not is_empty:
                 
@@ -230,13 +235,13 @@ if __name__ == '__main__':
 
         sm.close()
 
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except,unused-variable
         traceback.print_exc()
         time.sleep(10) # Usually this is in a new console, give debugers some time to read errors
 
     if sm:
         sm.close()
 
-
-
+if __name__ == '__main__':
+    main()
 

@@ -1,9 +1,17 @@
 
+"""
+The report module contains the details of formatting
+and writing out nbuild_test_report.html.
+As more reports are added their implementations
+will be done here.
+"""
+
 import os
 
 from nbuild.test import Test
 
 def write_reports_to(project, directory):
+    """Write all project reports to a directory"""
     test_rep_path = os.path.join(directory, 'nbuild_test_report.html')
     with open(test_rep_path, 'w') as test_rep:
         # test_table is a bunch of <tr> rows with <td> columns
@@ -96,6 +104,7 @@ pre {{
     project.reports.append(test_rep_path)
 
 def create_task_table(tests):
+    """A recursive function that makes <tr> elements, possibly with a <table> element containing sub-task tables"""
     table = ""
     if isinstance(tests, list):
         for t in tests:
