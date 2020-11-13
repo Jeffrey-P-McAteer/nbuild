@@ -17,6 +17,8 @@ how one might use `nbuild` to generate reports about projects.
 
 This library is also available from pypi/`pip`: https://pypi.org/project/nbuild/
 
+Documentation, examples, and a usage gallery is slowly moving from the readme file to https://jeffrey-p-mcateer.github.io/nbuild/site/
+
 # Example Processes
 
 ## Process 01
