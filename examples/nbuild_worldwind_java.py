@@ -11,7 +11,7 @@ p = nb.Project(
   poc='Jeffrey McAteer <jeffrey.p.mcateer@some-site.com>',
   description='NASA WorldWind comes with demo apps, one of which we will test.',
   type_=nb.SW_Application,
-  deliverable=nb.SW_Repository(url='https://github.com/NASAWorldWind/WorldWindJava.git'),
+  deliverable=nb.SW_Repository(url='https://github.com/NASAWorldWind/WorldWindJava.git', use_cache=True),
   tests=[
     
     nb.Test(name='Code compiles', task=nb.Task_Compile(build_system='ant')),

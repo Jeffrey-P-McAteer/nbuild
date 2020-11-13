@@ -13,7 +13,7 @@ import tempfile
 import shutil
 
 from nbuild.project import Project
-from nbuild.constants import *
+from nbuild.deliverable import *
 from nbuild.test import Test
 from nbuild.task import *
 
