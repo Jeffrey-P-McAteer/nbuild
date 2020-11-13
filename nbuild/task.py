@@ -1,4 +1,10 @@
 
+"""
+The task module contains the Task class.
+It also may be run standalone to capture
+stdout from a process and send it to a shared memory buffer.
+"""
+
 import subprocess
 import threading
 import os
@@ -9,13 +15,23 @@ import traceback
 from multiprocessing.shared_memory import SharedMemory
 
 def SharedMemoryCreator(name=None, size=None):
-  try:
-    return SharedMemory(name=name, size=size, create=True)
-  except Exception as e:
-    pass
-  return SharedMemory(name=name, size=size, create=False)
+    """
+    Wraps the multiprocessing.shared_memory.SharedMemory constructor to create the region
+    of memory if it does not exist, otherwise re-use an existing region with the same name.
+    """
+    try:
+        return SharedMemory(name=name, size=size, create=True)
+    except: # pylint: disable=bare-except
+        pass
+    return SharedMemory(name=name, size=size, create=False)
 
 class Task:
+    """
+    The Task class represents some step the tester
+    needs to take. In many cases these steps may
+    be automated (eg builds, downloads, some button pushing).
+    Task instances should be created by calling the Task_* methods below.
+    """
     def __init__(self, task_name, **kwargs):
         if not task_name:
             raise Exception('Task was not given a name!')
@@ -24,9 +40,14 @@ class Task:
         self.kwargs = dict(kwargs)
 
     def set_project(self, project):
+        """Assigns the project to be used when the task is evaluated (if CWD or shared data is needed)"""
         self.project = project
 
     def evaluate(self):
+        """
+        Executes a method and returns True/False if the task was successful.
+        Some tasks may always result in a success but record metadata to the project (eg for qualitative records)
+        """
         task_method_to_call = getattr(self, self.task_name)
         return task_method_to_call()
 
@@ -49,22 +70,22 @@ class Task:
 
         cmd = [f] + self.kwargs['args']
         if self.kwargs['interactive']:
-          # OS-specific wrappers which in turn run [cmd]
-          
-          # We also call "python task.py [cmd]" to copy stdout
-          # back to this process.
-          cmd = [sys.executable, os.path.abspath(__file__)] + cmd
+            # OS-specific wrappers which in turn run [cmd]
+            
+            # We also call "python task.py [cmd]" to copy stdout
+            # back to this process.
+            cmd = [sys.executable, os.path.abspath(__file__)] + cmd
 
-          if os.name == 'nt':
-            cmd = ['start', '/wait'] + [ ' '.join(cmd) ]
-          else:
-            term = os.environ['TERM']
-            if 'kitty' in term:
-              cmd = ['kitty', '-e'] + cmd
-            elif 'termite' in term:
-              cmd = ['termite', '-e'] + [ ' '.join(cmd) ]
+            if os.name == 'nt':
+                cmd = ['start', '/wait'] + [ ' '.join(cmd) ]
             else:
-              raise Exception('Unknown GUI terminal for $TERM={}'.format(term))
+                term = os.environ['TERM']
+                if 'kitty' in term:
+                    cmd = ['kitty', '-e'] + cmd
+                elif 'termite' in term:
+                    cmd = ['termite', '-e'] + [ ' '.join(cmd) ]
+                else:
+                    raise Exception('Unknown GUI terminal for $TERM={}'.format(term))
 
         self.project.task_data['proc'] = subprocess.Popen(
             cmd,
@@ -76,64 +97,64 @@ class Task:
         self.project.task_data['proc_stdout'] = ""
 
         if self.kwargs['interactive']:
-          def poll_shmem():
-            sm = SharedMemoryCreator(name="nbuild_task", size=4096)
-            while True:
-              # Just copy all non-\0 characters out over and over, replacing with \0 once read
-              for i in range(0, 4096):
-                if sm.buf[i]:
-                  self.project.task_data['proc_stdout'] += chr(sm.buf[i])
-                  sm.buf[i] = 0
+            def poll_shmem():
+                sm = SharedMemoryCreator(name="nbuild_task", size=4096)
+                while True:
+                    # Just copy all non-\0 characters out over and over, replacing with \0 once read
+                    for i in range(0, 4096):
+                        if sm.buf[i]:
+                            self.project.task_data['proc_stdout'] += chr(sm.buf[i])
+                            sm.buf[i] = 0
 
-              # Check if process exited; if so we also exit
-              if self.project.task_data['proc'].poll() != None:
-                break
+                    # Check if process exited; if so we also exit
+                    if self.project.task_data['proc'].poll() != None:
+                        break
 
-            sm.close()
+                sm.close()
 
 
-          t = threading.Thread(target=poll_shmem, args=())
-          t.start()
+            t = threading.Thread(target=poll_shmem, args=())
+            t.start()
 
         else:
-          # Run thread to copy stdout into self.project.task_data['proc_stdout']
-          def poll_proc():
-              p = self.project.task_data['proc']
-              while True:
-                  out = p.stdout.read(1)
-                  is_empty = (out == '' or out == b'' or len(out) < 1)
-                  if is_empty and p.poll() != None:
-                      break
-                  if not is_empty:
-                      # To/Do this will break pretty badly if we have multibyte utf-8 characters
-                      self.project.task_data['proc_stdout'] += out.decode('utf-8')
+            # Run thread to copy stdout into self.project.task_data['proc_stdout']
+            def poll_proc():
+                p = self.project.task_data['proc']
+                while True:
+                    out = p.stdout.read(1)
+                    is_empty = (out == '' or out == b'' or len(out) < 1)
+                    if is_empty and p.poll() != None:
+                        break
+                    if not is_empty:
+                        # To/Do this will break pretty badly if we have multibyte utf-8 characters
+                        self.project.task_data['proc_stdout'] += out.decode('utf-8')
 
-          t = threading.Thread(target=poll_proc, args=())
-          t.start()
+            t = threading.Thread(target=poll_proc, args=())
+            t.start()
         
         # Pause for 1/4 second to let process begin (lots of tests will expect some stdout)
         time.sleep(0.25)
 
         if self.project.task_data['proc']:
-          return True
+            return True
         else:
-          return False
+            return False
 
     def stdout_check(self):
         if self.kwargs['must_contain']:
-          # Check if proc_stdout has must_contain in it
-          # print('proc_stdout={}'.format(self.project.task_data['proc_stdout']))
-          must_contain = self.kwargs['must_contain']
+            # Check if proc_stdout has must_contain in it
+            # print('proc_stdout={}'.format(self.project.task_data['proc_stdout']))
+            must_contain = self.kwargs['must_contain']
 
-          if '{' in must_contain and '}' in must_contain:
-            # Pass all project.task_data variables through for replacement
-            
-            must_contain = must_contain.format( **self.project.task_data ) # ** unpacks dict into .format()'s **kwargs
+            if '{' in must_contain and '}' in must_contain:
+                # Pass all project.task_data variables through for replacement
+                
+                must_contain = must_contain.format( **self.project.task_data ) # ** unpacks dict into .format()'s **kwargs
 
-          if self.kwargs['case_insensitive']:
-            return must_contain.lower() in self.project.task_data['proc_stdout'].lower()
-          else:
-            return must_contain in self.project.task_data['proc_stdout']
+            if self.kwargs['case_insensitive']:
+                return must_contain.lower() in self.project.task_data['proc_stdout'].lower()
+            else:
+                return must_contain in self.project.task_data['proc_stdout']
 
         else:
             raise Exception('stdout_check unimplemented given kwargs={}'.format(self.kwargs))
@@ -168,53 +189,53 @@ if __name__ == '__main__':
     
     sm = None
     try:
-      sm = SharedMemoryCreator(name="nbuild_task", size=4096)
+        sm = SharedMemoryCreator(name="nbuild_task", size=4096)
 
-      p = subprocess.Popen(
-          cmd,
-          #cwd=self.project.get_cwd(), # CWD must be set in task.launch (which it is)
-          stdout=subprocess.PIPE,
-          stderr=subprocess.PIPE,
-          bufsize=0, # unbuffered
-      )
+        p = subprocess.Popen(
+            cmd,
+            #cwd=self.project.get_cwd(), # CWD must be set in task.launch (which it is)
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=0, # unbuffered
+        )
 
-      # Write stdout to buffer, wrapping around + blocking if the next char is not '\0'
-      next_free_i = 0;
-      for i in range(0, 4096):
-        sm.buf[i] = 0
+        # Write stdout to buffer, wrapping around + blocking if the next char is not '\0'
+        next_free_i = 0
+        for i in range(0, 4096):
+            sm.buf[i] = 0
 
-      while True:
-        out = p.stdout.read(1)
-        is_empty = (out == '' or out == b'' or len(out) < 1)
-        if is_empty and p.poll() != None:
-            break
-        if not is_empty:
-            
-            # Write all bytes read to stdout
-            sys.stdout.buffer.write(out)
-            sys.stdout.flush()
+        while True:
+            out = p.stdout.read(1)
+            is_empty = (out == '' or out == b'' or len(out) < 1)
+            if is_empty and p.poll() != None:
+                break
+            if not is_empty:
+                
+                # Write all bytes read to stdout
+                sys.stdout.buffer.write(out)
+                sys.stdout.flush()
 
-            # Write all bytes read to shared mem
-            for b in out:
-              # Wait until next free char is read
-              while sm.buf[next_free_i] != 0:
-                time.sleep(0.01)
-              sm.buf[next_free_i] = b
-              if next_free_i >= 4095:
-                next_free_i = 0
-                # Just a safety pause; ideally the reader would read everything before we roll around.
-                time.sleep(0.01)
-              else:
-                next_free_i += 1
+                # Write all bytes read to shared mem
+                for b in out:
+                    # Wait until next free char is read
+                    while sm.buf[next_free_i] != 0:
+                        time.sleep(0.01)
+                    sm.buf[next_free_i] = b
+                    if next_free_i >= 4095:
+                        next_free_i = 0
+                        # Just a safety pause; ideally the reader would read everything before we roll around.
+                        time.sleep(0.01)
+                    else:
+                        next_free_i += 1
 
-      sm.close()
+        sm.close()
 
     except Exception as e:
-      traceback.print_exc()
-      time.sleep(10) # Usually this is in a new console, give debugers some time to read errors
+        traceback.print_exc()
+        time.sleep(10) # Usually this is in a new console, give debugers some time to read errors
 
     if sm:
-      sm.close()
+        sm.close()
 
 
 

@@ -12,6 +12,7 @@ disable=trailing-newlines,
     too-few-public-methods,
     too-many-instance-attributes,
     protected-access,
+    invalid-name,
 
 
 [BASIC]
