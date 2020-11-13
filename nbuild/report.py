@@ -88,9 +88,10 @@ pre {{
     </table>
     {closing_remarks}
     <script>
-    function toggleRow(element) {{
-      element.getElementsByClassName('expanded-row-content')[0].classList.toggle('hide-row');
-      //console.log(event);
+    function toggleRow(event, element) {{
+      if (event.target == element || event.target.parentNode == element) {{
+        element.getElementsByClassName('expanded-row-content')[0].classList.toggle('hide-row');
+      }}
     }}
     </script>
   </body>
@@ -113,13 +114,13 @@ def create_task_table(tests):
         t = tests
         if tests.tests:
             # Write child tests to sub-table
-            table = ('<tr onclick="toggleRow(this)"><td>{tests}</td><td class="{_class}">{passed}</td><td>{description}</td>'+
+            table = ('<tr onclick="toggleRow(event, this)"><td>{tests}</td><td class="{_class}">{passed}</td><td>{description}</td>'+
                     '<td class="expanded-row-content hide-row">'+
                     '<table><tr><th>Tests</th><th>Status</th><th>Description</th></tr>{child_test_table}</table>'+
                     '</td></tr>').format(
                 _class='passed' if t.passed else 'failed',
                 passed='Passed' if t.passed else 'Failed',
-                description=t.description if t.description else t.name,
+                description=t.get_report_desc(),
                 tests=len(tests.tests),
                 child_test_table=create_task_table(tests.tests)
             )
@@ -128,7 +129,7 @@ def create_task_table(tests):
             table = '<tr><td>0</td><td class="{_class}">{passed}</td><td>{description}</td></tr>'.format(
                 _class='passed' if t.passed else 'failed',
                 passed='Passed' if t.passed else 'Failed',
-                description=t.description if t.description else t.name
+                description=t.get_report_desc()
             )
     else:
         raise Exception('Unknown data sent to create_task_table: {}'.format(tests))

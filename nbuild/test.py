@@ -55,4 +55,19 @@ class Test:
 
         return self.passed
 
+    def get_report_desc(self):
+        """
+        Return a description of the test and possibly any results
+        (eg if the tester had to pick a number to use during testing, that
+        ought to be reported here)
+        """
+        if not self.task:
+            if self.name:
+                return self.name
+            if self.description:
+                return self.description
+            return "No Test Name/Description"
+
+        return self.task.get_report_desc(name=self.name, description=self.description)
+
 

@@ -51,6 +51,23 @@ class Task:
         task_method_to_call = getattr(self, self.task_name)
         return task_method_to_call()
 
+    def get_report_desc(self, name="", description=""):
+        """
+        """
+        if self.task_name == 'tester_question':
+            return '<details><summary>{name}</summary>Q: {question}<br>A: {answer}</details> '.format(
+                name=name,
+                question=self.kwargs['question'],
+                answer=self.project.task_data[ self.kwargs['save_as'] ],
+            )
+        else:
+            if name:
+                return name
+            if description:
+                return description
+            raise Exception('no name/description passed to Task.get_report_desc and unhandled self.task_name={}'.format(self.task_name))
+
+
     # Now define all the various compile/launch/whatever methods
     def compile(self): # pylint: disable=missing-function-docstring
         success = False
