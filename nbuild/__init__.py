@@ -34,11 +34,12 @@ __all__ = [
 # generating documentation.
 # See https://pdoc3.github.io/pdoc/doc/pdoc/#overriding-docstrings-with-__pdoc__&gsc.tab=0
 __pdoc__ = {
-    'project': False,
     'constants': False,
-    'test': False,
+    'deliverable': False,
+    'project': False,
+    'report': False,
     'task': False,
-    'flowchart_gen': False,
+    'test': False,
 }
 
 
