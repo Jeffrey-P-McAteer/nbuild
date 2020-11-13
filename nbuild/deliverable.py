@@ -3,6 +3,9 @@
 The deliverable module holds the Deliverable class
 """
 
+import tempfile
+import subprocess
+
 class Deliverable:
     """
     The Deliverable class holds references to delivered assets.
@@ -25,8 +28,22 @@ class Deliverable:
         if self.type_ == 'SW_Repository':
             if self.kwargs['directory']:
                 return self.kwargs['directory']
+
+            elif self.kwargs['url']:
+                self.kwargs['directory_o'] = tempfile.TemporaryDirectory()
+                self.kwargs['directory'] = self.kwargs['directory_o'].name
+
+                # TO/DO detect git/svn/zip/tar files + treat appropriately
+                subprocess.run([
+                    'git', 'clone', '--depth', '1', self.kwargs['url'], self.kwargs['directory']
+                ], check=True)
+
+                return self.kwargs['directory']
+
             else:
-                raise Exception('TODO, clone git/svn repo to temp dir (also maybe .zip /.tar archives as well over https)')
+                raise Exception('Not enough information given to get/download CWD for SW_Repository')
+
+
         else:
             raise Exception('Cannot get_cwd for Deliverable of type_={}'.format(self.type_))
 

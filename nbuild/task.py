@@ -77,13 +77,21 @@ class Task:
                 success = False # Something broke
             else:
                 success = True
+
+        elif self.kwargs['build_system'] == 'ant':
+            p = subprocess.run(['ant'], cwd=self.project.get_cwd()) # pylint: disable=subprocess-run-check
+            if p.returncode:
+                success = False # Something broke
+            else:
+                success = True
+
         else:
             raise Exception('Unknown build_system for task "compile": {}'.format(self.kwargs['build_system']))
         return success
 
     def launch(self): # pylint: disable=missing-function-docstring
         f = self.kwargs['file']
-        if not os.path.exists(f):
+        if not os.path.exists(f) and os.path.exists(os.path.join(self.project.get_cwd(), f)):
             f = os.path.join(self.project.get_cwd(), f)
 
         cmd = [f] + self.kwargs['args']
