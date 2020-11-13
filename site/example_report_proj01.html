@@ -1,0 +1,77 @@
+<DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Project 01 Test Report</title>
+    <style>
+table {
+  table-layout: auto;
+  width: 100%;
+  background-color: #ffffff;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 4pt 8pt;
+  text-align: left;
+  width: auto;
+}
+tr {
+  /*grid-template-columns: repeat(3, 1fr);*/
+  grid-template-columns: 9ch 14ch 3fr;
+  justify-content: flex-start;
+  display: grid;
+}
+.passed {
+  background-color: #90ee90; /* light green */
+}
+.failed {
+  background-color: #ffcccb; /* light red */
+}
+pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.expanded-row-content {
+  border-top: none;
+  display: grid;
+  grid-column: 1/-1;
+  justify-content: flex-start;
+  color: #AEB1B3;
+  font-size: 13px;
+  background-color: #e0e0e0;
+}
+.hide-row {
+  display: none;
+}
+.expanded-row-content > table {
+  border: none;
+}
+
+    </style>
+  </head>
+  <body>
+    <h1>Project 01 Test Report</h1>
+     <table>
+      <tr>
+        <th>Tests</th>
+        <th>Status</th>
+        <th>Description</th>
+      </tr>
+      <tr><td>0</td><td class="passed">Passed</td><td>Code compiles</td></tr><tr onclick="toggleRow(event, this)"><td>2</td><td class="passed">Passed</td><td>non-interactive test</td><td class="expanded-row-content hide-row"><table><tr><th>Tests</th><th>Status</th><th>Description</th></tr><tr><td>0</td><td class="passed">Passed</td><td>Executable launches</td></tr><tr><td>0</td><td class="passed">Passed</td><td>App Greets User (non-interactive)</td></tr></table></td></tr><tr onclick="toggleRow(event, this)"><td>4</td><td class="passed">Passed</td><td>interactive test</td><td class="expanded-row-content hide-row"><table><tr><th>Tests</th><th>Status</th><th>Description</th></tr><tr><td>0</td><td class="passed">Passed</td><td>Executable launches</td></tr><tr><td>0</td><td class="passed">Passed</td><td>App asks for user name</td></tr><tr><td>0</td><td class="passed">Passed</td><td><details><summary>Tester must record typed in username</summary>Q: What username did you type in?<br>A: james</details> </td></tr><tr><td>0</td><td class="passed">Passed</td><td>App greets user</td></tr></table></td></tr>
+    </table>
+    
+    <script>
+    function toggleRow(event, element) {
+      if (event.target == element || event.target.parentNode == element) {
+        element.getElementsByClassName('expanded-row-content')[0].classList.toggle('hide-row');
+      }
+    }
+    </script>
+  </body>
+</html>
