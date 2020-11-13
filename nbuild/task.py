@@ -71,16 +71,27 @@ class Task:
     def stdout_check(self):
         if self.kwargs['must_contain']:
           # Check if proc_stdout has must_contain in it
-          print('proc_stdout={}'.format(self.project.task_data['proc_stdout']))
+          # print('proc_stdout={}'.format(self.project.task_data['proc_stdout']))
+          must_contain = self.kwargs['must_contain']
+
+          if '{' in must_contain and '}' in must_contain:
+            # Pass all project.task_data variables through for replacement
+            print('self.project.task_data=', self.project.task_data)
+            must_contain = must_contain.format( **self.project.task_data ) # ** unpacks dict into .format()'s **kwargs
+
           if self.kwargs['case_insensitive']:
-            return self.kwargs['must_contain'].lower() in self.project.task_data['proc_stdout'].lower()
+            return must_contain.lower() in self.project.task_data['proc_stdout'].lower()
           else:
-            return self.kwargs['must_contain']in self.project.task_data['proc_stdout']
+            return must_contain in self.project.task_data['proc_stdout']
 
         else:
             raise Exception('stdout_check unimplemented given kwargs={}'.format(self.kwargs))
 
         return False
+
+    def tester_question(self):
+        self.project.task_data[ self.kwargs['save_as'] ] = input(self.kwargs['question']+' ')
+        return True
 
 
 def Task_Compile(build_system=None):
@@ -92,5 +103,6 @@ def Task_LaunchProgram(file=None, args=[]):
 def Task_StdoutCheck(must_contain=None, case_insensitive=False):
     return Task('stdout_check', must_contain=must_contain, case_insensitive=case_insensitive)
 
-
+def Task_TesterQuestion(question=None, save_as='last_resp'):
+    return Task('tester_question', question=question, save_as=save_as)
 

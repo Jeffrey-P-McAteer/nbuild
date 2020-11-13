@@ -31,7 +31,12 @@ p = nb.Project(
       name='interactive test',
       tests=[
         nb.Test(name='Executable launches', task=nb.Task_LaunchProgram(file='main.exe')),
-        nb.Test(name='App Greets User', task=nb.Task_StdoutCheck(must_contain='what is your name', case_insensitive=True)),
+        nb.Test(name='App asks for user name', task=nb.Task_StdoutCheck(must_contain='what is your name', case_insensitive=True)),
+        nb.Test(
+            name='Tester must record typed in username',
+            task=nb.Task_TesterQuestion(question='What username did you type in?', save_as='user_name')
+        ),
+        nb.Test(name='App greets user', task=nb.Task_StdoutCheck(must_contain='hello {user_name}', case_insensitive=True)),
 
       ]
     ),
