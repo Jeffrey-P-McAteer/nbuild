@@ -1,9 +1,7 @@
 
 import os
 
-# Import nbuild; this requires nbuild.so to exist
-# under %LocalAppData%\programs\python\python38\lib\site-packages
-# or $HOME/.local/lib/python3.8/site-packages 
+# python -m pip install --user nbuild
 import nbuild as nb
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
