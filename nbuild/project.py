@@ -46,14 +46,20 @@ class Project:
         # and initialize state used during eval/reporting stages
         self.reports = []
         self.task_data = {} # tasks may assign whatever key/value data they want here
+        self.evaluated = False
 
         for t in self.tests:
             t.set_project(self)
 
     def evaluate(self):
         """Runs all tests and test tasks in the project"""
+        if self.evaluated:
+            print("Warning, evaluating {} twice...".format(self.name))
+
         for t in self.tests:
             t.evaluate()
+
+        self.evaluated = True
 
     def get_cwd(self):
         """
@@ -67,6 +73,9 @@ class Project:
         """
         Generates reports after evaluation and writes them to the specified directory, defaulting to "."
         """
+        if not self.evaluated:
+            raise Exception('Cannot write reports for an un-evaluated project, call .evaluate() first!')
+
         if not os.path.exists(directory):
             os.makedirs(directory)
         report.write_reports_to(self, directory)
