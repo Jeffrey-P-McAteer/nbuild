@@ -78,7 +78,11 @@ pre {{
   </head>
   <body>
     <h1>{name} Test Report</h1>
-     <table>
+    <details><summary>Deliverables</summary>
+      {deliverable}
+    </details>
+    <br>
+    <table>
       <tr>
         <th>Tests</th>
         <th>Status</th>
@@ -86,6 +90,7 @@ pre {{
       </tr>
       {test_table}
     </table>
+    <br>
     {closing_remarks}
     <script>
     function toggleRow(event, element) {{
@@ -98,6 +103,7 @@ pre {{
 </html>
 """.format(
         name=project.name,
+        deliverable=project.deliverable.get_report_desc(),
         test_table=test_table,
         closing_remarks=closing_remarks
       ))

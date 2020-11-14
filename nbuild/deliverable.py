@@ -87,6 +87,22 @@ class Deliverable:
         else:
             raise Exception('Cannot get_cwd for Deliverable of type_={}'.format(self.type_))
 
+    def get_report_desc(self):
+        if self.type_ == 'SW_Repository':
+            if self.kwargs['url']:
+                return "Remote code and/or artifacts from <code>{}</code> cloned to local directory <code>{}</code>".format(
+                    self.kwargs['url'],
+                    self.kwargs['directory']
+                )
+
+            elif self.kwargs['directory']:
+                return "Local directory of code and/or artifacts: <code>{}</code>".format(self.kwargs['directory'])
+
+            else:
+                raise Exception('Unknown type of SW_Repository')
+
+        else:
+            raise Exception('Cannot get_report_desc for Deliverable of type_={}'.format(self.type_))
 
 # These constants are merely used as words/types in other systems (mostly for deliverables)
 # Avoid using falsey values like "", 0, or [] because we often use None
