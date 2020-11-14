@@ -55,7 +55,7 @@ class Deliverable:
                 else:
                     subprocess.run([
                         'git', 'pull'
-                    ], cwd=self.kwargs['directory'], check=True)
+                    ], cwd=self.kwargs['directory'], check=False)
 
                 return self.kwargs['directory']
 
