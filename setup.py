@@ -17,7 +17,7 @@ with open("readme.md", "r") as fh:
 
 setuptools.setup(
     name="nbuild",
-    version="0.0.1",
+    version="0.0.2",
     author="Jeffrey McAteer",
     author_email="jeffrey.p.mcateer@gmail.com",
     description="A modern project-as-code specification, build, testing, and report generation library.",
