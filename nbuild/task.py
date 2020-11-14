@@ -73,14 +73,20 @@ class Task:
     def compile(self): # pylint: disable=missing-function-docstring
         success = False
         if self.kwargs['build_system'] == 'make':
-            p = subprocess.run(['make'], cwd=self.project.get_cwd()) # pylint: disable=subprocess-run-check
+            args = []
+            if self.kwargs['target']:
+                args = [ self.kwargs['target'] ]
+            p = subprocess.run(['make'] + args, cwd=self.project.get_cwd()) # pylint: disable=subprocess-run-check
             if p.returncode:
                 success = False # Something broke
             else:
                 success = True
 
         elif self.kwargs['build_system'] == 'ant':
-            p = subprocess.run(['ant'], cwd=self.project.get_cwd()) # pylint: disable=subprocess-run-check
+            args = []
+            if self.kwargs['target']:
+                args = [ self.kwargs['target'] ]
+            p = subprocess.run(['ant'] + args, cwd=self.project.get_cwd()) # pylint: disable=subprocess-run-check
             if p.returncode:
                 success = False # Something broke
             else:
@@ -190,9 +196,9 @@ class Task:
         return True
 
 
-def Task_Compile(build_system=None):
+def Task_Compile(build_system=None, target=None):
     """Creates a Task which can compile code"""
-    return Task('compile', build_system=build_system)
+    return Task('compile', build_system=build_system, target=target)
 
 def Task_LaunchProgram(file=None, args=None, interactive=False):
     """Creates a Task which executes deliverables"""

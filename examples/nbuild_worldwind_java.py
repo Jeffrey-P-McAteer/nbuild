@@ -14,7 +14,7 @@ p = nb.Project(
   deliverable=nb.SW_Repository(url='https://github.com/NASAWorldWind/WorldWindJava.git', use_cache=True),
   tests=[
     
-    nb.Test(name='Code compiles', task=nb.Task_Compile(build_system='ant')),
+    nb.Test(name='Code compiles', task=nb.Task_Compile(build_system='ant', target='compile')),
 
     nb.Test(
       name='interactive test',
