@@ -35,6 +35,10 @@ p = nb.Project(
             name='Globe UI appears',
             task=nb.Task_TesterQuestion(question='Did a window with a globe open?')
         ),
+        nb.Test(
+            name='Globe UI rotates',
+            task=nb.Task_TesterQuestion(question='Did the globe rotate when dragged?')
+        ),
 
 
       ]
