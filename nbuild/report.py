@@ -78,6 +78,8 @@ pre {{
   </head>
   <body>
     <h1>{name} Test Report</h1>
+    <p>Point of Contact: {poc}</p>
+    <br>
     <details><summary>Deliverables</summary>
       {deliverable}
     </details>
@@ -103,6 +105,7 @@ pre {{
 </html>
 """.format(
         name=project.name,
+        poc=project.poc,
         deliverable=project.deliverable.get_report_desc(),
         test_table=test_table,
         closing_remarks=closing_remarks
