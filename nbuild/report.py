@@ -78,8 +78,7 @@ pre {{
   </head>
   <body>
     <h1>{name} Test Report</h1>
-    <p>Point of Contact: {poc}</p>
-    <br>
+    <p>Point of Contact: <code>{poc}</code></p>
     <details><summary>Deliverables</summary>
       {deliverable}
     </details>
