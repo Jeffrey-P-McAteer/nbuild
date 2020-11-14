@@ -53,6 +53,7 @@ class Task:
 
     def get_report_desc(self, name="", description=""):
         """
+        Returns a description for this task, including any operator responses to questions
         """
         if self.task_name == 'tester_question':
             return '<details><summary>{name}</summary>Q: {question}<br>A: {answer}</details> '.format(
