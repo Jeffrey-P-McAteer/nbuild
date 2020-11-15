@@ -7,6 +7,8 @@ and is responsible for modeling an entire project/contract/effort
 import os
 import platform
 import subprocess
+import time
+import math
 
 from nbuild import report
 
@@ -47,6 +49,7 @@ class Project:
         self.reports = []
         self.task_data = {} # tasks may assign whatever key/value data they want here
         self.evaluated = False
+        self.evaluation_duration_s = 0
 
         for t in self.tests:
             t.set_project(self)
@@ -56,10 +59,12 @@ class Project:
         if self.evaluated:
             print("Warning, evaluating {} twice...".format(self.name))
 
+        eval_begin_s = time.time()
         for t in self.tests:
             t.evaluate()
 
         self.evaluated = True
+        self.evaluation_duration_s = math.ceil(time.time() - eval_begin_s)
 
     def get_cwd(self):
         """

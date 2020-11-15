@@ -7,6 +7,7 @@ will be done here.
 """
 
 import os
+import datetime
 
 from nbuild.test import Test
 
@@ -83,6 +84,8 @@ pre {{
       {deliverable}
     </details>
     <br>
+    <p>Test duration: <code>{eval_duration}</code> (hours:minutes:seconds)</p>
+    <br>
     <table>
       <tr>
         <th>Tests</th>
@@ -106,6 +109,7 @@ pre {{
         name=project.name,
         poc=project.poc,
         deliverable=project.deliverable.get_report_desc(),
+        eval_duration=datetime.timedelta(seconds=project.evaluation_duration_s),
         test_table=test_table,
         closing_remarks=closing_remarks
       ))
