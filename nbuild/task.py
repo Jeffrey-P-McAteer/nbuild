@@ -11,6 +11,7 @@ import os
 import sys
 import time
 import traceback
+import html
 
 from multiprocessing.shared_memory import SharedMemory
 
@@ -57,15 +58,21 @@ class Task:
         """
         if self.task_name == 'tester_question':
             return '<details><summary>{name}</summary>Q: {question}<br>A: {answer}</details> '.format(
-                name=name,
-                question=self.kwargs['question'],
-                answer=self.project.task_data[ self.kwargs['save_as'] ],
+                name=html.escape(name if name else description),
+                question=html.escape(self.kwargs['question']),
+                answer=html.escape(self.project.task_data[ self.kwargs['save_as'] ]),
             )
+        elif self.task_name == 'launch':
+            return '<details><summary>{name}</summary>Process stdout:<pre>{proc_stdout}</pre></details>'.format(
+                name=html.escape(name if name else description),
+                proc_stdout=html.escape(self.project.task_data['proc_stdout']),
+            )
+
         else:
             if name:
-                return name
+                return html.escape(name)
             if description:
-                return description
+                return html.escape(description)
             raise Exception('no name/description passed to Task.get_report_desc and unhandled self.task_name={}'.format(self.task_name))
 
 
@@ -101,6 +108,11 @@ class Task:
         if not os.path.exists(f) and os.path.exists(os.path.join(self.project.get_cwd(), f)):
             f = os.path.join(self.project.get_cwd(), f)
 
+        # Execute in project CWD, or project cwd + given cwd (usually relative)
+        cwd = self.project.get_cwd()
+        if os.path.exists(os.path.join(self.project.get_cwd(), self.kwargs['cwd'])):
+            cwd = os.path.join(self.project.get_cwd(), self.kwargs['cwd'])
+
         cmd = [f] + self.kwargs['args']
         if self.kwargs['interactive']:
             # OS-specific wrappers which in turn run [cmd]
@@ -122,7 +134,7 @@ class Task:
 
         self.project.task_data['proc'] = subprocess.Popen(
             cmd,
-            cwd=self.project.get_cwd(),
+            cwd=cwd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             bufsize=0, # unbuffered
@@ -171,6 +183,12 @@ class Task:
         return bool(self.project.task_data['proc']) # true if process launched, otherwise maybe false
 
     def stdout_check(self): # pylint: disable=missing-function-docstring
+        
+        time.sleep(self.kwargs['delay_s'])
+        while len(self.project.task_data['proc_stdout']) < self.kwargs['min_bytes']:
+            time.sleep(self.kwargs['delay_s'])
+        # Now we have at least min_bytes to check against.
+
         if self.kwargs['must_contain']:
             # Check if proc_stdout has must_contain in it
             # print('proc_stdout={}'.format(self.project.task_data['proc_stdout']))
@@ -200,15 +218,20 @@ def Task_Compile(build_system=None, target=None):
     """Creates a Task which can compile code"""
     return Task('compile', build_system=build_system, target=target)
 
-def Task_LaunchProgram(file=None, args=None, interactive=False):
-    """Creates a Task which executes deliverables"""
+def Task_LaunchProgram(file=None, args=None, interactive=False, cwd="."):
+    """Creates a Task which executes deliverables. CWD will be joined to the project's .get_cwd() response."""
     if args is None:
         args = []
-    return Task('launch', file=file, args=args, interactive=interactive)
+    return Task('launch', file=file, args=args, interactive=interactive, cwd=cwd)
 
-def Task_StdoutCheck(must_contain=None, case_insensitive=False):
-    """Creates a Task which polls a previously launched program's output and checks it for given values"""
-    return Task('stdout_check', must_contain=must_contain, case_insensitive=case_insensitive)
+def Task_StdoutCheck(must_contain=None, case_insensitive=False, delay_s=0.1, min_bytes=1):
+    """
+    Creates a Task which polls a previously launched program's output and checks it for given values.
+    The argument delay_s is how long this task waits before checking stdout, and if the
+    stdout when checked is less than min_bytes long we delay again for delay_s in a loop until
+    the program has output min_bytes bytes.
+    """
+    return Task('stdout_check', must_contain=must_contain, case_insensitive=case_insensitive, delay_s=delay_s, min_bytes=min_bytes)
 
 def Task_TesterQuestion(question=None, save_as='last_resp'):
     """Creates a Task which prompts the tester to enter some information which is saved in project.task_data"""

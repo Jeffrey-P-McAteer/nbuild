@@ -8,6 +8,7 @@ will be done here.
 
 import os
 import datetime
+import html
 
 from nbuild.test import Test
 
@@ -58,6 +59,9 @@ pre {{
   white-space: -pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
+  padding: 2px 4px;
+  border: 1px solid black;
+  background: rgba(20, 20, 20, 0.05);
 }}
 .expanded-row-content {{
   border-top: none;
@@ -106,8 +110,8 @@ pre {{
   </body>
 </html>
 """.format(
-        name=project.name,
-        poc=project.poc,
+        name=html.escape(project.name),
+        poc=html.escape(project.poc),
         deliverable=project.deliverable.get_report_desc(),
         eval_duration=datetime.timedelta(seconds=project.evaluation_duration_s),
         test_table=test_table,
