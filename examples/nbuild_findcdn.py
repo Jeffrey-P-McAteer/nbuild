@@ -27,20 +27,64 @@ p = nb.Project(
     #   task=nb.Task_LaunchProgram(file='findcdn', args=['list', 'github.com'])
     # ),
 
-
     nb.Test(
-      name='findcdn launches',
-      task=nb.Task_LaunchProgram(
-        file='python',
-        args=['-m', 'findcdn', 'list', 'github.com'],
-        cwd='src'
-      )
+      name='findcdn identifies google.com as being hosted by Google',
+      tests=[
+        nb.Test(
+          name='findcdn launches',
+          task=nb.Task_LaunchProgram(
+            file='python',
+            args=['-m', 'findcdn', 'list', 'google.com'],
+            cwd='src'
+          )
+        ),
+        nb.Test(
+          name='output contains "Google"',
+          task=nb.Task_StdoutCheck(must_contain='Google', case_insensitive=False, delay_s=2, min_bytes=100)
+        ),
+        nb.Test(
+          name='output contains "googlehosted.com"',
+          task=nb.Task_StdoutCheck(must_contain='googlehosted.com', case_insensitive=False, delay_s=0, min_bytes=100)
+        ),
+      ]
     ),
 
     nb.Test(
-      name='findcdn reports github.com as being hosted on Azure',
-      task=nb.Task_StdoutCheck(must_contain='azure', case_insensitive=True, delay_s=2, min_bytes=100)
+      name='findcdn identifies apple.com as being hosted by Akamai',
+      tests=[
+        nb.Test(
+          name='findcdn launches',
+          task=nb.Task_LaunchProgram(
+            file='python',
+            args=['-m', 'findcdn', 'list', 'apple.com'],
+            cwd='src'
+          )
+        ),
+        nb.Test(
+          name='output contains "Akamai"',
+          task=nb.Task_StdoutCheck(must_contain='Akamai', case_insensitive=False, delay_s=2, min_bytes=100)
+        ),
+      ]
     ),
+
+    nb.Test(
+      name='findcdn identifies code.gov as being hosted by Cloudfront',
+      tests=[
+        nb.Test(
+          name='findcdn launches',
+          task=nb.Task_LaunchProgram(
+            file='python',
+            args=['-m', 'findcdn', 'list', 'code.gov'],
+            cwd='src'
+          )
+        ),
+        nb.Test(
+          name='output contains "Cloudfront"',
+          task=nb.Task_StdoutCheck(must_contain='Cloudfront', case_insensitive=False, delay_s=2, min_bytes=100)
+        ),
+      ]
+    )
+
 
   ]
 )
