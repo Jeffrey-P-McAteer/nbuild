@@ -81,6 +81,7 @@ pre {
 details.shaded {
   border: 1px solid black;
   padding: 2pt 4pt;
+  margin: 1pt 2pt;
   background: rgba(20, 20, 20, 0.05);
   background-clip: content-box;
 }
@@ -303,30 +304,34 @@ def create_task_table(tests):
     return table
 
 
-def create_risk_list(risks):
-  table = "<ul>"
-
-  for r in risks:
-    table += '<li>'+r.get_report_desc()+'</li>'
-  
-  table += '</ul>'
-  return table
+def create_risk_list(risks, simple=False):
+  if simple:
+    table = "<ul>"
+    for r in risks:
+      table += "<li>{}</li>".format( html.escape(r.name) )
+    table += "</ul>"
+    return table
+  else:
+    table = "<p>"
+    for r in risks:
+      table += r.get_report_desc()
+    table += '<p>'
+    return table
 
 
 def create_risk_anychart_matrix_data(risks):
   risk_dicts = []
   for impact in range(1, 6):
     for probability in range(1, 6):
+      filtered_risks = filter_risks(risks, impact, probability)
       risk_dicts += [{
         'x': impact,
         'y': probability,
-        'heat': json.dumps({
-            'risk_html': create_risk_list(filter_risks(risks, impact, probability)),
-            'risk_count': len(filter_risks(risks, impact, probability)),
+        'heat': json.dumps({ # javascript parses the ['heat'] variable attached to points for details
+            'risk_html': create_risk_list(filtered_risks, simple=True),
+            'risk_count': len(filtered_risks),
         }),
-        'fill': risk_color_for(impact, probability, len(filter_risks(risks, impact, probability)) )
-        # 'risk_html': create_risk_list(filter_risks(risks, impact, probability)),
-        # 'risk_count': len(filter_risks(risks, impact, probability)),
+        'fill': risk_color_for(probability, impact, len(filtered_risks) )
       }]
 
   return json.dumps(risk_dicts, separators=(',', ':'))
@@ -352,7 +357,7 @@ def risk_color_for(probability, impact, num_risks):
   #   return colors[4]
 
   # Colors taken directly off an internal slide
-  if probability <= 5 and  impact <= 1: # green
+  if probability <= 5 and impact <= 1: # green
     return colors[0]
   
   if probability <= 3 and impact <= 2: # green

@@ -1,4 +1,6 @@
 
+import html
+
 class Risk:
     def __init__(self, name=None, if_=None, then=None, probability=5, impact=5):
         if not name:
@@ -27,5 +29,15 @@ class Risk:
         """
         Return a description of the risk, for use in creating lists.
         """
-        return self.name
+        return """
+          <details class="shaded">
+            <summary>{name}</summary>
+            <p><b>IF:</b>{if_}</p>
+            <p><b>THEN:</b>{then}</p>
+          </details>
+        """.format(
+            name=html.escape(self.name),
+            if_=html.escape(self.if_),
+            then=html.escape(self.then)
+        ).strip()
 
