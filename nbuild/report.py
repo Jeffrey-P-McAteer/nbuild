@@ -26,6 +26,10 @@ def write_reports_to(project, directory):
   <head>
     <title>{name} Test Report</title>
     <style>
+html, body {{
+  background: #ffffff;
+  color: #000000;
+}}
 table {{
   table-layout: auto;
   width: 100%;
@@ -77,6 +81,15 @@ pre {{
 }}
 .expanded-row-content > table {{
   border: none;
+}}
+details {{
+  border: 1px solid black;
+  padding: 2pt 4pt;
+  background: rgba(20, 20, 20, 0.05);
+  background-clip: content-box;
+}}
+details > summary {{
+  background: #ffffff;
 }}
 
     </style>
