@@ -22,6 +22,7 @@ class Project:
                  description='',
                  type_=None,
                  deliverable=None,
+                 risks=None,
                  tests=None
                  ):
         # First check args (fatal errors)
@@ -31,6 +32,8 @@ class Project:
             raise Exception('Error: Project was not given a type!')
         if not deliverable:
             raise Exception('Error: Project was not given a deliverable!')
+        if not risks:
+            raise Exception('Error: Project was not given any risks!')
         if not tests:
             raise Exception('Error: Project was not given any tests!')
         # Check args (non-fatal warnings)
@@ -43,6 +46,7 @@ class Project:
         self.description = description
         self.type_ = type_
         self.deliverable = deliverable
+        self.risks = risks
         self.tests = tests
 
         # and initialize state used during eval/reporting stages

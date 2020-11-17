@@ -16,6 +16,7 @@ from nbuild.project import Project
 from nbuild.deliverable import *
 from nbuild.test import Test
 from nbuild.task import *
+from nbuild.risk import Risk
 
 
 # nbuild cares a great deal about it's public API;
