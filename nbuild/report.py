@@ -310,7 +310,7 @@ def create_risk_list(risks, simple=False):
   if simple:
     table = "<ul>"
     for r in risks:
-      table += "<li>{}</li>".format( html.escape(r.name) )
+      table += "<li>{} ({})</li>".format( html.escape(r.name), r.mitigation.name )
     table += "</ul>"
     return table
   else:

@@ -18,21 +18,24 @@ p = nb.Project(
       if_='CDN ip range, host headers, or other identification data is unknown to us',
       then='For a given set of domains CDN identification will be impossible',
       probability=4,
-      impact=1
+      impact=1,
+      mitigation=nb.Mitigation.Accept(),
     ),
     nb.Risk(
       name='random risk',
       if_='something happens',
       then='another thing will occur',
       probability=3,
-      impact=2
+      impact=2,
+      mitigation=nb.Mitigation.Transfer('James Smith <jsmith@example.com>, specifically project X will handle this risk if it occurs.'),
     ),
     nb.Risk(
       name='random risk 2',
       if_='something happens',
       then='another thing will occur',
       probability=5,
-      impact=1
+      impact=1,
+      mitigation=nb.Mitigation.Control('We will bolt on 1/2 inch steel plates which will make that side of the machine heavier and less likely to tip over.')
     ),
     nb.Risk(
       name='random risk 3',
