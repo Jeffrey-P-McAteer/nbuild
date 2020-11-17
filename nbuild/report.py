@@ -117,7 +117,7 @@ anychart.onDocumentReady(function () {
 
   chart
     .title()
-    .enabled(true)
+    .enabled(false)
     .text('Risk Matrix')
     .padding([0, 0, 20, 0]);
 
@@ -202,8 +202,10 @@ anychart.onDocumentReady(function () {
     </details>
     <br>
     
+    <h2>Risks</h2>
     {risk_list}
     
+    <h2>Risk Matrix</h2>
     <div id="risk_matrix"></div>
     <script>window.risk_data = {risk_data};</script>
     <script>{anychart_init_script}</script>
