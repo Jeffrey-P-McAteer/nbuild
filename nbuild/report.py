@@ -117,6 +117,7 @@ anychart.onDocumentReady(function () {
   chart.width = '680pt';
   chart.height = '480pt';
 
+
   chart.stroke('#fff');
   chart
     .hovered()
@@ -151,11 +152,21 @@ anychart.onDocumentReady(function () {
   chart.yAxis().ticks(false);
   chart.yScale().inverted(false);
   chart.yAxis().orientation("left");
+  chart.yAxis().title().enabled(true);
+  chart.yAxis().title().useHtml(true);
+  chart.yAxis().title().text(
+    '<span style="font-size:1.6em;">Likelihood</span> <em>(1-rare, 5-guaranteed to occur)</em>'
+  );
   
   chart.xAxis().stroke(null);
   chart.xAxis().ticks(false);
   chart.xScale().inverted(false);
   chart.xAxis().orientation("bottom");
+  chart.xAxis().title().enabled(true);
+  chart.xAxis().title().useHtml(true);
+  chart.xAxis().title().text(
+    '<span style="font-size:1.6em;">Consequence</span> <em>(1-small impact, 5-project will fail)</em>'
+  );
 
   chart.tooltip().allowLeaveChart(true);
   //chart.tooltip().allowLeaveScreen(true);
