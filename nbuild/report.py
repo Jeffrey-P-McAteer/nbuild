@@ -68,7 +68,7 @@ pre {
   display: grid;
   grid-column: 1/-1;
   justify-content: flex-start;
-  color: #AEB1B3;
+  /*color: #AEB1B3;*/
   font-size: 13px;
   background-color: #e0e0e0;
 }
@@ -90,10 +90,12 @@ details.shaded > summary {
 }
 
 /* specific to risk reports only */
-#risk_matrix {
-  max-width: 680pt;
-  max-height: 480pt;
+#risk_matrix, #risk_matrix > div {
+  width: 850pt !important; /* 25% larger b/c we only draw chart in 75% of stage */
+  height: 480pt !important;
 }
+.anychart-credits { display: none; }
+
 """
 
 
@@ -112,12 +114,17 @@ def write_risk_report(project, risk_rep_path):
 anychart.onDocumentReady(function () {
   var chart = anychart.heatMap(window.risk_data);
 
+  chart.width = '680pt';
+  chart.height = '480pt';
+
   chart.stroke('#fff');
   chart
     .hovered()
     .stroke('6 #fff')
     .fill('#545f69')
     .labels({ fontColor: '#fff' });
+
+  chart.bounds(0, 0, "75%", "100%");
 
   chart.interactivity().selectionMode('none');
 
@@ -151,10 +158,11 @@ anychart.onDocumentReady(function () {
   chart.xAxis().orientation("bottom");
 
   chart.tooltip().allowLeaveChart(true);
-  chart.tooltip().allowLeaveScreen(true);
-  chart.tooltip().allowLeaveStage(true);
+  //chart.tooltip().allowLeaveScreen(true);
+  //chart.tooltip().allowLeaveStage(true); // causes scrolling bug
   chart.tooltip().fontColor("#ffffff");
   chart.tooltip().background().fill("#000000");
+  chart.tooltip().separator(true);
   chart.tooltip().title().useHtml(true);
   chart
     .tooltip()
@@ -180,11 +188,13 @@ anychart.onDocumentReady(function () {
 
   chart.container('risk_matrix');
   chart.draw();
+
+  window.chart = chart; // for debugging in browsers
 });
 
 """
 
-        risk_rep.write("""<DOCTYPE html>
+        risk_rep.write("""<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>{name} Risk Report</title>
@@ -252,7 +262,7 @@ def write_test_report(project, test_rep_path):
         # test_table is a bunch of <tr> rows with <td> columns
         test_table = create_task_table(project.tests)
 
-        test_rep.write("""<DOCTYPE html>
+        test_rep.write("""<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>{name} Test Report</title>

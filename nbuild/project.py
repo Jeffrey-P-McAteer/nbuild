@@ -32,18 +32,39 @@ class Project:
             raise Exception('Error: Project was not given a type!')
         if not deliverable:
             raise Exception('Error: Project was not given a deliverable!')
-        if not risks:
+        if risks is None:
             raise Exception('Error: Project was not given any risks!')
-        if not tests:
+        if tests is None:
             raise Exception('Error: Project was not given any tests!')
+        
+        # Warnings are not blockers but things that are missing/should be improved in the project description;
+        # e.g. not mentioning cost impact in a risk.
+        self.warnings = []
+
         # Check args (non-fatal warnings)
         if not poc:
-            print('Warning: no point of contact given for project: {}'.format(name))
+            w = 'WARNING: no point of contact given for project: {}'.format(name)
+            print(w)
+            self.warnings.append(w)
         
+        if len(tests) < 1:
+            w = 'WARNING: no tests given for project: {}'.format(name)
+            print(w)
+            self.warnings.append(w)
+
+        if len(risks) < 1:
+            w = 'WARNING: no risks given for project: {}'.format(name)
+            print(w)
+            self.warnings.append(w)
+
         # Then assign state data
-        self.name = name
-        self.poc = poc
-        self.description = description
+        self.name = name.strip()
+        self.poc = poc.strip()
+        # Descriptions are modified such that only a single space is used instead of
+        # multiple spaces and newlines are removed.
+        # This allows project authors to indent descriptions without having those indentations
+        # move words around in the report.
+        self.description = (' '.join(description.split())).strip()
         self.type_ = type_
         self.deliverable = deliverable
         self.risks = risks
@@ -54,9 +75,6 @@ class Project:
         self.task_data = {} # tasks may assign whatever key/value data they want here
         self.evaluated = False
         self.evaluation_duration_s = 0
-        # Warnings are not blockers but things that are missing/should be improved in the project description;
-        # e.g. not mentioning cost impact in a risk.
-        self.warnings = []
 
         for t in self.tests:
             t.set_project(self)

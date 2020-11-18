@@ -105,13 +105,30 @@ class Deliverable:
             else:
                 raise Exception('Unknown type of SW_Repository')
 
+        elif self.type_ == 'Phys_Item':
+                return "Physical item: <code>{}</code>".format(
+                    html.escape(self.kwargs['item_name'])
+                )
+
         else:
             raise Exception('Cannot get_report_desc for Deliverable of type_={}'.format(self.type_))
 
 # These constants are merely used as words/types in other systems (mostly for deliverables)
 # Avoid using falsey values like "", 0, or [] because we often use None
 # values as defaults and test if variables have been set with "if not X: raise Exception('must specify X')"
-SW_Application = 1
+def SW_Application(archive_url=None, directory=None, app_executable_name=None):
+    """Creates a deliverable of type SW_Application"""
+    if not app_executable_name:
+        raise Exception('All SW_Application deliverables must specify app_executable_name=')
+    if (not archive_url) and (not directory):
+        raise Exception('All SW_Application deliverables must specify either a archive_url= pointing to a download or a directory= pointing to deliverable files')    
+
+    return Deliverable(
+        type_='SW_Application',
+        url=archive_url,
+        directory=directory,
+        app_executable_name=app_executable_name,
+    )
 
 def SW_Repository(url=None, directory=None, use_cache=False):
     """Creates a Deliverable of type SW_Repository"""
@@ -124,3 +141,15 @@ def SW_Repository(url=None, directory=None, use_cache=False):
         directory=directory,
         use_cache=use_cache,
     )
+
+def Phys_Item(item_name=None):
+    """Creates a Deliverable which is a single physical item"""
+    if not item_name:
+        raise Exception('Phys_Item must have an item_name= specified!')
+
+    return Deliverable(
+        type_='Phys_Item',
+        item_name=item_name,
+    )
+
+
