@@ -54,8 +54,14 @@ class Project:
         self.task_data = {} # tasks may assign whatever key/value data they want here
         self.evaluated = False
         self.evaluation_duration_s = 0
+        # Warnings are not blockers but things that are missing/should be improved in the project description;
+        # e.g. not mentioning cost impact in a risk.
+        self.warnings = []
 
         for t in self.tests:
+            t.set_project(self)
+
+        for t in self.risks:
             t.set_project(self)
 
     def evaluate(self):
@@ -77,6 +83,10 @@ class Project:
         Some deliverables, such as goods + services, will raise an exception if asked for their CWD.
         """
         return self.deliverable.get_cwd()
+
+    def get_warning_lines(self):
+        """Returns warnings joined by a newline"""
+        return (''+os.linesep).join(self.warnings)
 
     def write_reports_to(self, directory='.'):
         """

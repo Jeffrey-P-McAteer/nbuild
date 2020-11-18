@@ -61,7 +61,13 @@ class Risk:
     Describes a risk, it's probability, impact, and mitigation strategy.
     Default mitigation is to accept risks.
     """
-    def __init__(self, name=None, if_=None, then=None, probability=5, impact=5, mitigation=Mitigation.Accept()):
+    def __init__(self,
+                 name=None,
+                 if_=None,
+                 then=None,
+                 probability=5,
+                 impact=5,
+                 mitigation=Mitigation.Accept()):
         if not name:
             raise Exception('Risk must have a name!')
         
@@ -70,7 +76,7 @@ class Risk:
         
         if not then:
             raise Exception('Risk must have a "then" specified!')
-        
+
         if probability < 1 or probability > 5:
             raise Exception('probability must be between 1 and 5 inclusive, {} is outside this range.'.format(probability))
 
@@ -80,12 +86,35 @@ class Risk:
         if not mitigation or not isinstance(mitigation, Mitigation):
             raise Exception('mitigation must be of type Mitigation')
 
+        # print warnings that should be adressed but cannot stop the Risk from being constructed
+        # These are also added to project.warnings when we are given the project object.
+        self.warnings = []
+        if not 'cost' in then.lower():
+            w = 'WARNING: cost not mentioned in Risk "{}" "then" section (then={})'.format(name, then)
+            self.warnings.append(w)
+            print(w)
+        if not 'schedule' in then.lower():
+            w = 'WARNING: schedule not mentioned in Risk "{}" "then" section (then={})'.format(name, then)
+            self.warnings.append(w)
+            print(w)
+        
+
+        self.project = None
         self.name = name
         self.if_ = if_
         self.then = then
         self.probability = int(probability)
         self.impact = int(impact)
         self.mitigation = mitigation
+
+        # These are derived information computed early for reporing purposes
+        self.is_issue = self.probability >= 5
+        self.is_watch_item = self.impact > 3 and mitigation.name.lower() == 'accept'
+
+    def set_project(self, project):
+        """Stores a reference to the project and adds warnings to project.warnings"""
+        self.project = project
+        self.project.warnings += self.warnings
 
     def get_report_desc(self):
         """

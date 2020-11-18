@@ -105,6 +105,8 @@ def write_risk_report(project, risk_rep_path):
     with open(risk_rep_path, 'w') as risk_rep:
 
         risk_list = create_risk_list(project.risks)
+        issue_list = create_risk_list([r for r in project.risks if r.is_issue])
+        watch_items_list = create_risk_list([r for r in project.risks if r.is_watch_item])
 
         anychart_init_script = r"""
 anychart.onDocumentReady(function () {
@@ -206,13 +208,23 @@ anychart.onDocumentReady(function () {
     </details>
     <br>
     
-    <h2>Risks</h2>
+    <h2>All Risks</h2>
     {risk_list}
-    
+
     <h2>Risk Matrix</h2>
     <div id="risk_matrix"></div>
     <script>window.risk_data = {risk_data};</script>
     <script>{anychart_init_script}</script>
+
+    <h3>Issues <em>(risks with likelihood of 5)</em></h3>
+    {issue_list}
+
+    <h3>Watch Items <em>(risks with impact > 3 and mitigation of "Accept")</em></h3>
+    {watch_items_list}
+
+    <h2>Warnings</h2>
+    <em>These are minor issues detected when saving the project description</em>
+    <pre>{warnings}</pre>
 
   </body>
 </html>
@@ -222,8 +234,11 @@ anychart.onDocumentReady(function () {
         poc=html.escape(project.poc),
         deliverable=project.deliverable.get_report_desc(),
         risk_list=risk_list,
+        issue_list=issue_list,
+        watch_items_list=watch_items_list,
         risk_data=create_risk_anychart_matrix_data(project.risks),
         anychart_init_script=anychart_init_script,
+        warnings=project.get_warning_lines(),
       ))
 
     project.reports.append(risk_rep_path)
@@ -269,6 +284,11 @@ def write_test_report(project, test_rep_path):
       }}
     }}
     </script>
+
+    <h2>Warnings</h2>
+    <em>These are minor issues detected when saving the project description</em>
+    <pre>{warnings}</pre>
+
   </body>
 </html>
 """.format(
@@ -277,7 +297,8 @@ def write_test_report(project, test_rep_path):
         poc=html.escape(project.poc),
         deliverable=project.deliverable.get_report_desc(),
         eval_duration=datetime.timedelta(seconds=project.evaluation_duration_s),
-        test_table=test_table
+        test_table=test_table,
+        warnings=project.get_warning_lines(),
       ))
 
     project.reports.append(test_rep_path)
