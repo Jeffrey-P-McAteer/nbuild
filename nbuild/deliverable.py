@@ -6,6 +6,7 @@ The deliverable module holds the Deliverable class
 import tempfile
 import subprocess
 import os
+import html
 
 import zipfile
 # import tarfile
@@ -88,15 +89,18 @@ class Deliverable:
             raise Exception('Cannot get_cwd for Deliverable of type_={}'.format(self.type_))
 
     def get_report_desc(self):
+        """
+        Describes the deliverable using HTML.
+        """
         if self.type_ == 'SW_Repository':
             if self.kwargs['url']:
                 return "Remote code and/or artifacts from <code>{}</code> cloned to local directory <code>{}</code>".format(
-                    self.kwargs['url'],
-                    self.kwargs['directory']
+                    html.escape(self.kwargs['url']),
+                    html.escape(self.kwargs['directory'])
                 )
 
             elif self.kwargs['directory']:
-                return "Local directory of code and/or artifacts: <code>{}</code>".format(self.kwargs['directory'])
+                return "Local directory of code and/or artifacts: <code>{}</code>".format(html.escape(self.kwargs['directory']))
 
             else:
                 raise Exception('Unknown type of SW_Repository')

@@ -98,6 +98,10 @@ details.shaded > summary {
 
 
 def write_risk_report(project, risk_rep_path):
+    """
+    Given a project, extract risk data and write it to an HTML document
+    at risk_rep_path
+    """
     with open(risk_rep_path, 'w') as risk_rep:
 
         risk_list = create_risk_list(project.risks)
@@ -225,6 +229,10 @@ anychart.onDocumentReady(function () {
     project.reports.append(risk_rep_path)
 
 def write_test_report(project, test_rep_path):
+    """
+    Given a project that has been evaluated (.evaluate()),
+    extract test data and write it to an HTML document at risk_rep_path
+    """
     with open(test_rep_path, 'w') as test_rep:
         # test_table is a bunch of <tr> rows with <td> columns
         test_table = create_task_table(project.tests)
@@ -307,86 +315,89 @@ def create_task_table(tests):
 
 
 def create_risk_list(risks, simple=False):
-  if simple:
-    table = "<ul>"
-    for r in risks:
-      table += "<li>{} ({})</li>".format( html.escape(r.name), r.mitigation.name )
-    table += "</ul>"
-    return table
-  else:
-    table = "<p>"
-    for r in risks:
-      table += r.get_report_desc()
-    table += '<p>'
-    return table
+    """
+    Turns a risk objects into HTML. if simple=True this becomes a <ul>,
+    otherwise it becomes a list of <details> which may be expanded for details.
+    """
+    if simple:
+        table = "<ul>"
+        for r in risks:
+            table += "<li>{} ({})</li>".format( html.escape(r.name), r.mitigation.name )
+        table += "</ul>"
+        return table
+    else:
+        table = "<p>"
+        for r in risks:
+            table += r.get_report_desc()
+        table += '<p>'
+        return table
 
 
 def create_risk_anychart_matrix_data(risks):
-  risk_dicts = []
-  for impact in range(1, 6):
-    for probability in range(1, 6):
-      filtered_risks = filter_risks(risks, impact, probability)
-      risk_dicts += [{
-        'x': impact,
-        'y': probability,
-        'heat': json.dumps({ # javascript parses the ['heat'] variable attached to points for details
-            'risk_html': create_risk_list(filtered_risks, simple=True),
-            'risk_count': len(filtered_risks),
-        }),
-        'fill': risk_color_for(probability, impact, len(filtered_risks) )
-      }]
+    """
+    Turns risk objects into JSON suitable for use in an anychart heatmap.
+    The 'heat' value is a JSON string containing an HTML risk list and a
+    count of the risks in the given impact + probability square.
+    """
+    risk_dicts = []
+    for impact in range(1, 6):
+        for probability in range(1, 6):
+            filtered_risks = filter_risks(risks, impact, probability)
+            risk_dicts += [{
+                'x': impact,
+                'y': probability,
+                'heat': json.dumps({ # javascript parses the ['heat'] variable attached to points for details
+                    'risk_html': create_risk_list(filtered_risks, simple=True),
+                    'risk_count': len(filtered_risks),
+                }),
+                'fill': risk_color_for(probability, impact, len(filtered_risks) )
+            }]
 
-  return json.dumps(risk_dicts, separators=(',', ':'))
+    return json.dumps(risk_dicts, separators=(',', ':'))
 
-def risk_color_for(probability, impact, num_risks):
-  # See https://www.colourlovers.com/palette/56122/Sweet_Lolly
-  colors = ["#00C176", "#88C100", "#FABE28", "#FF8A00", "#FF003C"]
-  
-  if num_risks < 1:
-    return "#f0f0f0"
+def risk_color_for(probability, impact, num_risks): # pylint: disable=too-many-return-statements
+    """
+    Given a probability + impact, color a square.
+    If there are no risks the square will be light grey (#f0f0f0).
+    """
+    # See https://www.colourlovers.com/palette/56122/Sweet_Lolly
+    colors = ["#00C176", "#88C100", "#FABE28", "#FF8A00", "#FF003C", "#f0f0f0"]
+    
+    if num_risks > 0: # we have some risks, color them
 
-  # Naive colors
-  # score = probability * impact
-  # if score < 3:
-  #   return colors[0]
-  # elif score < 6:
-  #   return colors[1]
-  # elif score < 9:
-  #   return colors[2]
-  # elif score < 14:
-  #   return colors[3]
-  # else:
-  #   return colors[4]
+        # Colors taken directly off an internal slide
+        if probability <= 5 and impact <= 1: # green
+            return colors[0]
+        
+        if probability <= 3 and impact <= 2: # green
+            return colors[0]
+        if probability <= 5 and impact <= 2: # yellow
+            return colors[2]
 
-  # Colors taken directly off an internal slide
-  if probability <= 5 and impact <= 1: # green
-    return colors[0]
-  
-  if probability <= 3 and impact <= 2: # green
-    return colors[0]
-  if probability <= 5 and impact <= 2: # yellow
-    return colors[2]
+        if probability <= 2 and impact <= 3: # green
+            return colors[0]
+        if probability <= 4 and impact <= 3: # yellow
+            return colors[2]
+        if probability <= 5 and impact <= 3: # red
+            return colors[4]
 
-  if probability <= 2 and impact <= 3: # green
-    return colors[0]
-  if probability <= 4 and impact <= 3: # yellow
-    return colors[2]
-  if probability <= 5 and impact <= 3: # red
-    return colors[4]
+        if probability <= 1 and impact <= 4: # green
+            return colors[0]
+        if probability <= 3 and impact <= 4: # yellow
+            return colors[2]
+        if probability <= 5 and impact <= 4: # red
+            return colors[4]
 
-  if probability <= 1 and impact <= 4: # green
-    return colors[0]
-  if probability <= 3 and impact <= 4: # yellow
-    return colors[2]
-  if probability <= 5 and impact <= 4: # red
-    return colors[4]
+        if probability <= 2 and impact <= 5: # yellow
+            return colors[2]
+        if probability <= 5 and impact <= 5: # red
+            return colors[4]
 
-  if probability <= 2 and impact <= 5: # yellow
-    return colors[2]
-  if probability <= 5 and impact <= 5: # red
-    return colors[4]
+    # Nothing else matched, use grey
+    return colors[5]
 
 
 def filter_risks(risks, impact_eq, probability_eq):
-  return [r for r in risks if r.impact == impact_eq and r.probability == probability_eq]
+    """Returns only risks which match the given impact and probability numbers"""
+    return [r for r in risks if r.impact == impact_eq and r.probability == probability_eq]
 

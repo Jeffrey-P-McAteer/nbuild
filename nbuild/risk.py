@@ -1,21 +1,33 @@
 
+"""
+The risk module holds a Mitigation class
+and the Risk class.
+"""
+
 import html
 
 class Mitigation:
+    """
+    The Mitigation class should only be constructed using the following static methods:
+      - Mitigation.Accept()
+      - Mitigation.Avoid('Description of how the risk is avoided; eg by dropping the feature if it cannot be built safely')
+      - Mitigation.Control('Description of how the risk is controlled; eg by building 2x features to perform 1x task')
+      - Mitigation.Transfer('To whom? Bob in dept X will handle risk Y because his task is relevant to Y')
+    """
     @staticmethod
-    def Accept():
+    def Accept(): # pylint: disable=missing-function-docstring
         return Mitigation(name='accept')
 
     @staticmethod
-    def Avoid(how):
+    def Avoid(how): # pylint: disable=missing-function-docstring
         return Mitigation(name='avoid', how=how)
 
     @staticmethod
-    def Control(how):
+    def Control(how): # pylint: disable=missing-function-docstring
         return Mitigation(name='control', how=how)
 
     @staticmethod
-    def Transfer(to):
+    def Transfer(to): # pylint: disable=missing-function-docstring
         return Mitigation(name='transfer', to=to)
 
     def __init__(self, name=None, **kwargs):
@@ -29,23 +41,27 @@ class Mitigation:
         Return a description of the mitigation
         """
         if self.name == 'accept':
-          return 'Accept'
+            return 'Accept'
 
         elif self.name == 'avoid':
-          return 'Avoid: {}'.format(html.escape(self.kwargs['how']))
+            return 'Avoid: {}'.format(html.escape(self.kwargs['how']))
 
         elif self.name == 'control':
-          return 'Control: {}'.format(html.escape(self.kwargs['how']))
+            return 'Control: {}'.format(html.escape(self.kwargs['how']))
 
         elif self.name == 'transfer':
-          return 'Transfer to {}'.format(html.escape(self.kwargs['to']))
+            return 'Transfer to {}'.format(html.escape(self.kwargs['to']))
 
         else:
-            raise Exception('Unknown mitigation name = {}'.format())
+            raise Exception('Unknown mitigation name = {}'.format(self.name))
 
 
 class Risk:
-    def __init__(self, name=None, if_=None, then=None, probability=5, impact=5, mitigation=Mitigation.Accept(), details=None):
+    """
+    Describes a risk, it's probability, impact, and mitigation strategy.
+    Default mitigation is to accept risks.
+    """
+    def __init__(self, name=None, if_=None, then=None, probability=5, impact=5, mitigation=Mitigation.Accept()):
         if not name:
             raise Exception('Risk must have a name!')
         
