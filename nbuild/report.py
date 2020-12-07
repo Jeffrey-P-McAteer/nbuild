@@ -63,6 +63,9 @@ pre {
   border: 1px solid black;
   background: rgba(20, 20, 20, 0.05);
 }
+p {
+  max-width: 70vw;
+}
 .expanded-row-content {
   border-top: none;
   display: grid;
@@ -208,7 +211,7 @@ anychart.onDocumentReady(function () {
         risk_rep.write("""<!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>{name} Risk Report</title>
+    <title>Risk Report: {name}</title>
 
     <!-- TODO we should inline these resources, possibly using Google's closure compiler to remove unreached JS branches -->
 
@@ -222,7 +225,7 @@ anychart.onDocumentReady(function () {
     <style>{REPORT_CSS}</style>
   </head>
   <body>
-    <h1>{name} Risk Report</h1>
+    <h1>Risk Report: {name}</h1>
     <p>Point of Contact: <code>{poc}</code></p>
     <details class="shaded"><summary>Deliverables</summary>
       {deliverable}
@@ -276,11 +279,11 @@ def write_test_report(project, test_rep_path):
         test_rep.write("""<!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>{name} Test Report</title>
+    <title>Test Report: {name}</title>
     <style>{REPORT_CSS}</style>
   </head>
   <body>
-    <h1>{name} Test Report</h1>
+    <h1>Test Report: {name}</h1>
     <p>Point of Contact: <code>{poc}</code></p>
     <details class="shaded"><summary>Deliverables</summary>
       {deliverable}

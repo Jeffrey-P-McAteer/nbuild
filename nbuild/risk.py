@@ -20,14 +20,17 @@ class Mitigation:
 
     @staticmethod
     def Avoid(how): # pylint: disable=missing-function-docstring
+        how = ' '.join(how.split()).strip()
         return Mitigation(name='avoid', how=how)
 
     @staticmethod
     def Control(how): # pylint: disable=missing-function-docstring
+        how = ' '.join(how.split()).strip()
         return Mitigation(name='control', how=how)
 
     @staticmethod
     def Transfer(to): # pylint: disable=missing-function-docstring
+        to = ' '.join(to.split()).strip()
         return Mitigation(name='transfer', to=to)
 
     def __init__(self, name=None, **kwargs):
@@ -85,6 +88,9 @@ class Risk:
 
         if not mitigation or not isinstance(mitigation, Mitigation):
             raise Exception('mitigation must be of type Mitigation')
+
+        # Pre-process some data to remove common whitespace artifacts
+        then = ' '.join(then.split()).strip()
 
         # print warnings that should be adressed but cannot stop the Risk from being constructed
         # These are also added to project.warnings when we are given the project object.
